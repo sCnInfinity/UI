@@ -1,6 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.geom.AffineTransform;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -27,17 +32,25 @@ public class Train extends JPanel implements Runnable {
 	/** to check, whether train is running */
 	private boolean running;
 	/** to check, whether train is charging */
+	private boolean isFinishedUp;
+	private boolean isFinishedDown;
+	private boolean isFinishedRight;
+	private boolean isFinishedLeft;
+	private boolean isFinishedUpBack;
+	private boolean isFinishedDownBack;
+	private boolean isFinishedRightBack;
+	private boolean isFinishedLeftBack;
 	private boolean charging;
-	boolean lastStepDown = false;
-	boolean lastStepUp = false;
-	boolean lastStepLeft = false;
-	boolean lastStepRight = true;
 	private String imagePath;
+	private double rotation = 0;
 
 	private int x = 75;
-	private int y = 50;
-	private int w = 50;
-	private int h = 10;
+	private int y = 25;
+	// private int w = 50;
+	// private int h = 10;
+	private int w = 60;
+	private int h = 60;
+
 	private int stepSize = 2;
 	private int cX = 0;
 	private int cY = 0;
@@ -66,6 +79,34 @@ public class Train extends JPanel implements Runnable {
 		this.index = index;
 	}
 
+	public void paintComponent(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		super.paintComponent(g);
+		AffineTransform old = g2d.getTransform();
+		g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
+		g2d.setColor(TrackView.getColors(index));
+		g2d.drawRoundRect(10, 20, 50, 10, w / 2, h / 2);
+		g2d.fillRoundRect(10, 20, 50, 10, w / 2, h / 2);
+
+		g2d.setTransform(old);
+		// if (light) {
+		// g.setColor(Color.YELLOW);
+		// if (lastStepUp || lastStepLeft) {
+		// g2d.drawRoundRect(3, 3, 4, 4, 1, 1);
+		// g2d.fillRoundRect(3, 3, 4, 4, 1, 1);
+		// } else if (lastStepRight) {
+		// g2d.drawRoundRect(w - 8, h - 7, 4, 4, 1, 1);
+		// g2d.fillRoundRect(w - 8, h - 7, 4, 4, 1, 1);
+		// } else {
+		// g2d.drawRoundRect(w - 7, h - 8, 4, 4, 1, 1);
+		// g2d.fillRoundRect(w - 7, h - 8, 4, 4, 1, 1);
+		// }
+		//
+		// }
+		g.setColor(Color.BLACK);
+		repaint();
+	}
+
 	/**
 	 * Sets the name for a train and writes changes to the temporary log
 	 * display. Also updates the train selection list.
@@ -85,14 +126,14 @@ public class Train extends JPanel implements Runnable {
 		}
 	}
 
-	public String getImagePath(){
+	public String getImagePath() {
 		return imagePath;
 	}
-	
-	public void setImagePath(String path){
+
+	public void setImagePath(String path) {
 		imagePath = path;
 	}
-	
+
 	/**
 	 * Returns the lifetime remaining for a trains battery
 	 * 
@@ -267,37 +308,6 @@ public class Train extends JPanel implements Runnable {
 		return tempo;
 	}
 
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		g.setColor(TrackView.getColors(index));
-		g.drawRoundRect(0, 0, w, h, w / 2, h / 2);
-		g.fillRoundRect(0, 0, w, h, w / 2, h / 2);
-		if (light) {
-			g.setColor(Color.YELLOW);
-			if (lastStepUp || lastStepLeft) {
-				g.drawRoundRect(3, 3, 4, 4, 1, 1);
-				g.fillRoundRect(3, 3, 4, 4, 1, 1);
-			} else if (lastStepRight) {
-				g.drawRoundRect(w - 8, h - 7, 4, 4, 1, 1);
-				g.fillRoundRect(w - 8, h - 7, 4, 4, 1, 1);
-			} else {
-				g.drawRoundRect(w - 7, h - 8, 4, 4, 1, 1);
-				g.fillRoundRect(w - 7, h - 8, 4, 4, 1, 1);
-			}
-
-		}
-
-		g.setColor(Color.BLACK);
-		repaint();
-	}
-
-	public void setSteps(boolean up, boolean down, boolean left, boolean right) {
-		lastStepUp = up;
-		lastStepDown = down;
-		lastStepRight = right;
-		lastStepLeft = left;
-	}
-
 	public int[] getPositionParameters() {
 		return new int[] { x, y, w, h };
 	}
@@ -307,26 +317,29 @@ public class Train extends JPanel implements Runnable {
 			if (getDirection().equals("backward")) {
 				cX = x + w / 2;
 				cY = y + h / 2;
-				if (cX <= 75 && cY < 400)
-					moveDown();
-				else if (cX < 400 && cY >= 400)
+
+				if (!isFinishedRightBack) {
 					moveRight();
-				else if (cX >= 400 && cY > 55)
+				} else if (!isFinishedUpBack)
 					moveUp();
-				else
+				else if (isFinishedUpBack && !isFinishedLeftBack) {
 					moveLeft();
+				} else
+					moveDown();
+
 			}
 			if (getDirection().equals("forward")) {
 				cX = x + w / 2;
 				cY = y + h / 2;
-				if (cX <= 75 && cY > 55)
-					moveUp();
-				else if (cX > 55 && cY >= 400)
-					moveLeft();
-				else if (cX >= 400 && cY < 400)
-					moveDown();
-				else
+				isFinishedUp = true;
+				if (isFinishedUp && !isFinishedRight && !isFinishedLeft)
 					moveRight();
+				else if (isFinishedRight && !isFinishedDown)
+					moveDown();
+				else if (isFinishedDown && !isFinishedLeft)
+					moveLeft();
+				else
+					moveUp();
 			}
 			try {
 				Thread.sleep(500 / tempo);
@@ -338,56 +351,124 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	public void moveRight() {
-		if (lastStepDown || lastStepUp) {
-			int tmp = w;
-			w = h;
-			h = tmp;
-		}
 		x = cX - w / 2;
 		y = cY - h / 2;
-		x = x + stepSize;
-		setSteps(false, false, false, true);
+		if (getDirection().equals("forward")) {
+			if (cX > 360) {
+				rotation = rotation + 4.5;
+				x = x + stepSize;
+				y = y + stepSize;
+			} else {
+				x = x + stepSize;
+			}
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cX > 400)
+				isFinishedRight = true;
+			repaint();
+		} else if (getDirection().equals("backward")) {
+			if (cX > 360 && cX <= 400) {
+				rotation = rotation - 4.5;
+				x = x + stepSize;
+				y = y - stepSize;
+			} else {
+				x = x + stepSize;
+			}
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cX > 400)
+				isFinishedRightBack = true;
+			repaint();
+		}
+
+	}
+
+	public void moveDown() {
+		isFinishedDown = false;
+		x = cX - w / 2;
+		y = cY - h / 2;
+		if (cY >= 360) {
+			rotation = rotation + 4.5;
+			x = x - stepSize;
+			y = y + stepSize;
+		} else
+			y = y + stepSize;
+		cX = x + w / 2;
+		cY = y + h / 2;
+		if (cY > 400)
+			isFinishedDown = true;
 		repaint();
 	}
 
 	public void moveLeft() {
-
-		if (lastStepDown || lastStepUp) {
-			int tmp = w;
-			w = h;
-			h = tmp;
-
-		}
+		isFinishedUp = false;
 		x = cX - w / 2;
 		y = cY - h / 2;
-		x = x - stepSize;
-		setSteps(false, false, true, false);
-		repaint();
-	}
-
-	public void moveDown() {
-		if (lastStepLeft || lastStepRight) {
-			int tmp = w;
-			w = h;
-			h = tmp;
+		if(getDirection().equals("forward")){
+			if (cX <= 95) {
+				rotation = rotation + 4.5;
+				x = x - stepSize;
+				y = y - stepSize;
+			} else
+				x = x - stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cX <= 55) {
+				isFinishedLeft = true;
+			}
 		}
-		x = cX - w / 2;
-		y = cY - h / 2;
-		y = y + stepSize;
-		setSteps(false, true, false, false);
+		else if(getDirection().equals("backward")){
+			if (cX <= 95) {
+				rotation = rotation - 4.5;
+				x = x - stepSize;
+				y = y + stepSize;
+			} else
+				x = x - stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cX <= 55) {
+				isFinishedLeftBack = true;
+			}
+		}
+		
 		repaint();
 	}
 
 	public void moveUp() {
-		if (lastStepLeft || lastStepRight) {
-			int tmp = w;
-			w = h;
-			h = tmp;
-		}
+		isFinishedRight = false;
+		isFinishedUp = false;
+		isFinishedDown = false;
 		x = cX - w / 2;
 		y = cY - h / 2;
-		y = y - stepSize;
-		setSteps(true, false, false, false);
+		if (getDirection().equals("forward")) {
+			if (cY < 95) {
+				rotation = rotation + 4.5;
+				x = x + stepSize;
+				y = y - stepSize;
+			} else
+				y = y - stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cX >= 95) {
+				isFinishedUp = true;
+				isFinishedRight = false;
+				isFinishedLeft = false;
+			}
+		} else if (getDirection().equals("backward")) {
+			if (cY < 96) {
+				rotation = rotation - 4.5;
+				x = x - stepSize;
+				y = y - stepSize;
+			} else
+				y = y - stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			if (cY <= 55) {
+				isFinishedUpBack = true;
+				isFinishedLeftBack = false;
+			}
+		}
+
 		repaint();
 	}
 
