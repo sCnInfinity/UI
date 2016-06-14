@@ -42,9 +42,8 @@ public class Counter implements Runnable {
 				battery = battery - 5;
 				Controller.getListOfTrains().get(index).setBatteryLifeTime(battery);
 				// Update Slider if indizes match
-				if (Controller.getCPanel().getTrainSelection().getSelectedIndex() == index) {
-					Controller.getCPanel().getSliders()[1].setValue(battery);
-				}
+				Controller.getCPanel().getSliders(index)[1].setValue(battery);
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -54,8 +53,6 @@ public class Counter implements Runnable {
 					|| (battery == 25 && Controller.getListOfTrains().get(index).isRunning()))
 				Controller.getLogView().updateLog(
 						Controller.getListOfTrains().get(index).getName() + ": " + battery + "% Batterieleistung");
-			Controller.getCPanel().setEnabled(false);
-			Controller.getCPanel().setEnabled(true);
 		}
 		// Write Message to the Temporary Log Display if battery is empty
 		if (battery < 5){

@@ -122,7 +122,6 @@ public class Train extends JPanel implements Runnable {
 		// Only display name changes if the old name differs from the new one
 		if (!oldName.equals(name)) {
 			Controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
-			Controller.setTextListOfTrains();
 		}
 	}
 

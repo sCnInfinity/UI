@@ -30,7 +30,8 @@ public class Charger implements Runnable {
 	public void run() {
 		// Akkulaufzeit bei jedem Durchlauf aktualisieren
 		battery = Controller.getListOfTrains().get(index).getBatteryLifeTime();
-		//solange Akku nicht voll geladen, der Zug auflädt und der Zug nicht läuft
+		// solange Akku nicht voll geladen, der Zug auflädt und der Zug nicht
+		// läuft
 		while (battery < 91 && Controller.getListOfTrains().get(index).isCharging()
 				&& !Controller.getListOfTrains().get(index).isRunning()) {
 			// Sleep-Aufruf, um das Programm für den Nutzer bedienbar zu machen.
@@ -42,16 +43,15 @@ public class Charger implements Runnable {
 				// Aktualisiert den Slider, wenn der im Control Panel
 				// ausgewählte Zug dem in diesem Thread bearbeiteten Zug
 				// entspricht
-				if (Controller.getCPanel().getTrainSelection().getSelectedIndex() == index) {
-					Controller.getCPanel().getSliders()[1].setValue(battery);
-				}
+				Controller.getCPanel().getSliders(index)[1].setValue(battery);
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		// Nachricht im Log: Batterie aufgeladen, wenn Akku voll geladen
 		Controller.getLogView().updateLog(Controller.getListOfTrains().get(index).getName() + ": Batterie aufgeladen.");
-		//Ladevorgang beenden
+		// Ladevorgang beenden
 		Controller.getListOfTrains().get(index).setCharging(false);
 	}
 }
