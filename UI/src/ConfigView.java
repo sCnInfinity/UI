@@ -70,6 +70,7 @@ public class ConfigView extends JFrame implements ActionListener {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setContentPane(panel);
 		setSize(500, 300);
+		setResizable(false);
 		setVisible(true);
 
 		panel.setLayout(null);

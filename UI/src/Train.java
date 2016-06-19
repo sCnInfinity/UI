@@ -32,26 +32,17 @@ public class Train extends JPanel implements Runnable {
 	/** to check, whether train is running */
 	private boolean running;
 	/** to check, whether train is charging */
-	private boolean isFinishedUp;
-	private boolean isFinishedDown;
-	private boolean isFinishedRight;
-	private boolean isFinishedLeft;
-	private boolean isFinishedUpBack;
-	private boolean isFinishedDownBack;
-	private boolean isFinishedRightBack;
-	private boolean isFinishedLeftBack;
 	private boolean charging;
 	private String imagePath;
 	private double rotation = 0;
-
+	private double rotationChange = 4.5;
+	private int stepSize = 2;
+	
 	private int x = 75;
-	private int y = 25;
-	// private int w = 50;
-	// private int h = 10;
+	private int y = 23;
 	private int w = 60;
 	private int h = 60;
 
-	private int stepSize = 2;
 	private int cX = 0;
 	private int cY = 0;
 
@@ -316,26 +307,24 @@ public class Train extends JPanel implements Runnable {
 			if (getDirection().equals("backward")) {
 				cX = x + w / 2;
 				cY = y + h / 2;
-
-				if (!isFinishedRightBack) {
+				if (cX < 400 && cX >= 95 && cY > 360)
 					moveRight();
-				} else if (!isFinishedUpBack)
+				else if (cX > 360 && cY >= 55)
 					moveUp();
-				else if (isFinishedUpBack && !isFinishedLeftBack) {
+				else if (cX > 55 && cY < 95)
 					moveLeft();
-				} else
+				else if (cX < 95 && cY <= 400)
 					moveDown();
 
 			}
 			if (getDirection().equals("forward")) {
 				cX = x + w / 2;
 				cY = y + h / 2;
-				isFinishedUp = true;
-				if (isFinishedUp && !isFinishedRight && !isFinishedLeft)
+				if (cX >= 95 && cY <= 95 && cX < 400)
 					moveRight();
-				else if (isFinishedRight && !isFinishedDown)
+				else if (cX >= 360 && cY <= 400)
 					moveDown();
-				else if (isFinishedDown && !isFinishedLeft)
+				else if (cX > 55 && cY > 360)
 					moveLeft();
 				else
 					moveUp();
@@ -354,7 +343,7 @@ public class Train extends JPanel implements Runnable {
 		y = cY - h / 2;
 		if (getDirection().equals("forward")) {
 			if (cX > 360) {
-				rotation = rotation + 4.5;
+				rotation = rotation + rotationChange;
 				x = x + stepSize;
 				y = y + stepSize;
 			} else {
@@ -362,12 +351,10 @@ public class Train extends JPanel implements Runnable {
 			}
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cX > 400)
-				isFinishedRight = true;
 			repaint();
 		} else if (getDirection().equals("backward")) {
 			if (cX > 360 && cX <= 400) {
-				rotation = rotation - 4.5;
+				rotation = rotation - rotationChange;
 				x = x + stepSize;
 				y = y - stepSize;
 			} else {
@@ -375,97 +362,84 @@ public class Train extends JPanel implements Runnable {
 			}
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cX > 400)
-				isFinishedRightBack = true;
 			repaint();
 		}
 
 	}
 
 	public void moveDown() {
-		isFinishedDown = false;
 		x = cX - w / 2;
 		y = cY - h / 2;
-		if (cY >= 360) {
-			rotation = rotation + 4.5;
-			x = x - stepSize;
-			y = y + stepSize;
-		} else
-			y = y + stepSize;
-		cX = x + w / 2;
-		cY = y + h / 2;
-		if (cY > 400)
-			isFinishedDown = true;
-		repaint();
+		if (getDirection().equals("forward")) {
+			if (cY >= 360) {
+				rotation = rotation + rotationChange;
+				x = x - stepSize;
+				y = y + stepSize;
+			} else
+				y = y + stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			repaint();
+		} else if (getDirection().equals("backward")) {
+			if (cY >= 360) {
+				rotation = rotation - rotationChange;
+				x = x + stepSize;
+				y = y + stepSize;
+			} else
+				y = y + stepSize;
+			cX = x + w / 2;
+			cY = y + h / 2;
+			repaint();
+		}
 	}
 
 	public void moveLeft() {
-		isFinishedUp = false;
 		x = cX - w / 2;
 		y = cY - h / 2;
-		if(getDirection().equals("forward")){
+		if (getDirection().equals("forward")) {
 			if (cX <= 95) {
-				rotation = rotation + 4.5;
+				rotation = rotation + rotationChange;
 				x = x - stepSize;
 				y = y - stepSize;
 			} else
 				x = x - stepSize;
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cX <= 55) {
-				isFinishedLeft = true;
-			}
-		}
-		else if(getDirection().equals("backward")){
+		} else if (getDirection().equals("backward")) {
 			if (cX <= 95) {
-				rotation = rotation - 4.5;
+				rotation = rotation - rotationChange;
 				x = x - stepSize;
 				y = y + stepSize;
 			} else
 				x = x - stepSize;
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cX <= 55) {
-				isFinishedLeftBack = true;
-			}
 		}
-		
+
 		repaint();
 	}
 
 	public void moveUp() {
-		isFinishedRight = false;
-		isFinishedUp = false;
-		isFinishedDown = false;
 		x = cX - w / 2;
 		y = cY - h / 2;
 		if (getDirection().equals("forward")) {
 			if (cY < 95) {
-				rotation = rotation + 4.5;
+				rotation = rotation + rotationChange;
 				x = x + stepSize;
 				y = y - stepSize;
 			} else
 				y = y - stepSize;
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cX >= 95) {
-				isFinishedUp = true;
-				isFinishedRight = false;
-				isFinishedLeft = false;
-			}
 		} else if (getDirection().equals("backward")) {
-			if (cY < 96) {
-				rotation = rotation - 4.5;
+			if (cY < 95 && cY >= 55) {
+				rotation = rotation - rotationChange;
 				x = x - stepSize;
 				y = y - stepSize;
 			} else
 				y = y - stepSize;
 			cX = x + w / 2;
 			cY = y + h / 2;
-			if (cY <= 55) {
-				isFinishedUpBack = true;
-				isFinishedLeftBack = false;
-			}
 		}
 
 		repaint();
