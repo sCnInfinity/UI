@@ -1,6 +1,8 @@
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -67,13 +69,18 @@ public class ConfigView extends JFrame implements ActionListener {
 	 */
 	private void buildWindow() {
 		setTitle("Eisenbahn: Konfiguration");
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setContentPane(panel);
 		setSize(500, 300);
 		setResizable(false);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {
+				Controller.closeConfig(index, Controller.getListOfTrains().get(index).getImagePath(),
+						Controller.getListOfTrains().get(index).getName(),
+						Controller.getListOfTrains().get(index).getName());
+			}
+		});
 		setVisible(true);
 
-		panel.setLayout(null);
 		panel.add(btnCloseConfig);
 		panel.add(txtName);
 		panel.add(btnSelectImage);
@@ -82,8 +89,6 @@ public class ConfigView extends JFrame implements ActionListener {
 
 			imageLabel = new JLabel(prepareImage());
 			// adjust label size to image size
-			imageLabel.setBounds(120, 120, (int) imageLabel.getPreferredSize().getWidth(),
-					(int) imageLabel.getPreferredSize().getHeight());
 			panel.add(imageLabel);
 		} catch (Exception e) {
 		}
@@ -119,6 +124,10 @@ public class ConfigView extends JFrame implements ActionListener {
 		if (s == btnSelectImage) {
 			imagePath = Controller.selectImage(this);
 			imageLabel.setIcon(prepareImage());
+//			imageLabel.setI
+//			imageLabel = new JLabel(prepareImage());
+			panel.add(imageLabel);
+			revalidate();
 			repaint();
 		}
 

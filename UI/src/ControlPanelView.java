@@ -1,7 +1,6 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -125,31 +123,9 @@ public class ControlPanelView extends JFrame {
 		panelSwitches.add(btnSwitch3Left);
 		panelSwitches.add(btnSwitch3Right);
 
-		JMenuBar listenerBar = new JMenuBar();
-		JMenu listenerMenu = new JMenu();
-
-		getMenuItems()[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, Event.CTRL_MASK));
-		listenerMenu.add(getMenuItems()[0]);
-		getMenuItems()[1].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.CTRL_MASK));
-		listenerMenu.add(getMenuItems()[0]);
-		getMenuItems()[2].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.SHIFT_MASK));
-		listenerMenu.add(getMenuItems()[2]);
-		getMenuItems()[3].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.CTRL_MASK));
-		listenerMenu.add(getMenuItems()[3]);
-		getMenuItems()[4].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.SHIFT_MASK));
-		listenerMenu.add(getMenuItems()[4]);
-		getMenuItems()[5].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.CTRL_MASK));
-		listenerMenu.add(getMenuItems()[5]);
-		getMenuItems()[6].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.SHIFT_MASK));
-		listenerMenu.add(getMenuItems()[6]);
-
-		listenerBar.add(listenerMenu);
-		listenerBar.setVisible(false);
-
-		// cPanel.getPanelSettings().add(listenerBar);
 		panelTrainLeft.setLayout(new GridLayout(3, 1));
 		panelTrainLeft.add(panelSelection);
-		panelTrainLeft.add(listenerBar);
+		panelTrainLeft.add(new JPanel());
 		panelTrainLeft.add(panelSwitches);
 
 		for (int i = 0; i < numberOfTrains; i++) {
@@ -186,18 +162,37 @@ public class ControlPanelView extends JFrame {
 		}
 		panel.setLayout(new GridLayout(1, numberOfTrains, 5, 5));
 
-		// Content Pane: Layout und Linkes, Rechtes Panel hinzufügen
+		JMenuBar listenerBar = new JMenuBar();
+		JMenu listenerMenu = new JMenu();
+
+		getMenuItems()[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, Event.CTRL_MASK));
+		listenerMenu.add(getMenuItems()[0]);
+		getMenuItems()[1].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.CTRL_MASK));
+		listenerMenu.add(getMenuItems()[1]);
+		getMenuItems()[2].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.SHIFT_MASK));
+		listenerMenu.add(getMenuItems()[2]);
+		getMenuItems()[3].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.CTRL_MASK));
+		listenerMenu.add(getMenuItems()[3]);
+		getMenuItems()[4].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.SHIFT_MASK));
+		listenerMenu.add(getMenuItems()[4]);
+		getMenuItems()[5].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.CTRL_MASK));
+		listenerMenu.add(getMenuItems()[5]);
+		getMenuItems()[6].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.SHIFT_MASK));
+		listenerMenu.add(getMenuItems()[6]);
+
+		listenerBar.add(listenerMenu);
 
 		// Frame Einstellungen
 		setSize(700, 400);
 		setTitle("Control-Panel");
-		// Fenster in der Mitte des Bildschirms anzeigen
 		setMinimumSize(new Dimension(700, 400));
+		// Fenster in der Mitte des Bildschirms anzeigen
 		setLocationRelativeTo(null);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		setContentPane(panel);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setJMenuBar(listenerBar);
 		setVisible(true);
 
 		btnSwitch1Left.setEnabled(false);

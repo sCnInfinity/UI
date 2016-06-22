@@ -1,6 +1,6 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -21,7 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JWindow;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -93,6 +95,16 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @category Constructor
 	 */
 	public Controller() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		switch1 = new Switch(1);
+		switch2 = new Switch(2);
+		switch3 = new Switch(3);
+		showLoadingScreen();
+
 		for (int i = 0; i < numberOfTrains; i++) {
 			String[] input = readDataOnOpen(i);
 			if (input[0] != "") {
@@ -101,20 +113,43 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				listOfTrains.add(new Train("Zug " + i, i));
 			}
 		}
-		switch1 = new Switch(1);
-		switch2 = new Switch(2);
-		switch3 = new Switch(3);
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				prepareLogView();
+				prepareControlPanel();
+				new Thread(new LogWriter()).start();
+				new Thread(tView).start();
+			}
+		});
+		
+	}
 
-		lView = new LogView();
-		prepareLogView();
-		prepareControlPanel();
+	private void showLoadingScreen() {
+		JWindow loadingScreen = new JWindow();
+		JPanel content = new JPanel(new BorderLayout());
+		JProgressBar progressBar = new JProgressBar(0, 100);
 
-		lView.updateLog("  \n------ Neue Session -------");
-		lView.updateLog("Neues ControlPanel geöffnet");
-		lView.updateLog("Allen Weiche sind standardmäßig nach links ausgerichtet.");
-		lView.updateLog(Controller.getListOfTrains().get(0).getName() + " wird jetzt gesteuert");
-		new Thread(new LogWriter()).start();
-		new Thread(tView).start();
+		content.add(new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("loadingScreenBG.jpg")).getImage()
+				.getScaledInstance(300, 200, java.awt.Image.SCALE_SMOOTH))), BorderLayout.CENTER);
+		content.add(progressBar, BorderLayout.SOUTH);
+
+		loadingScreen.add(content);
+		loadingScreen.pack();
+		loadingScreen.setLocationRelativeTo(null);
+
+		progressBar.setStringPainted(true);
+		loadingScreen.setVisible(true);
+		for (int i = 0; i < 100; i++) {
+			progressBar.setValue(i);
+			progressBar.setString(i + "%");
+			try {
+				Thread.sleep(20);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		loadingScreen.dispose();
 	}
 
 	/**
@@ -140,6 +175,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * vom Desktop in das neu gestartete Log-Fenster.
 	 */
 	public void prepareLogView() {
+		lView = new LogView();
 		String line;
 		try {
 			BufferedReader br = new BufferedReader(
@@ -150,6 +186,10 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		} catch (Exception e) {
 		}
 		lView.getLogFile();
+		lView.updateLog("  \n------ Neue Session -------");
+		lView.updateLog("Neues ControlPanel geöffnet");
+		lView.updateLog("Allen Weiche sind standardmäßig nach links ausgerichtet.");
+		lView.updateLog(Controller.getListOfTrains().get(0).getName() + " wird jetzt gesteuert");
 	}
 
 	/**
@@ -162,7 +202,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	public void prepareControlPanel() {
 		// create control panel
 		cPanel = new ControlPanelView(numberOfTrains);
-
 		// add all Listeners
 		for (int i = 0; i < listOfTrains.size(); i++) {
 			cPanel.getTrainToggleButtons(i)[0].addActionListener(this);
@@ -196,8 +235,11 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	public void openConfig(int index) {
 		cPanel.setFocusableWindowState(false);
 		cPanel.setEnabled(false);
-		config = new ConfigView(index);
-		cPanel.repaint();
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				config = new ConfigView(index);
+			}
+		});
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class Train extends JPanel implements Runnable {
 	private double rotation = 0;
 	private double rotationChange = 4.5;
 	private int stepSize = 2;
-	
+
 	private int x = 75;
 	private int y = 23;
 	private int w = 60;
@@ -76,25 +76,12 @@ public class Train extends JPanel implements Runnable {
 		AffineTransform old = g2d.getTransform();
 		g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
 		g2d.setColor(TrackView.getColors(index));
-		g2d.drawRoundRect(10, 20, 50, 10, w / 2, h / 2);
-		g2d.fillRoundRect(10, 20, 50, 10, w / 2, h / 2);
-
+		g2d.fillRect(12, 26, 30, 8);
+		if (light)
+			g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
+		else
+			g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
 		g2d.setTransform(old);
-		// if (light) {
-		// g.setColor(Color.YELLOW);
-		// if (lastStepUp || lastStepLeft) {
-		// g2d.drawRoundRect(3, 3, 4, 4, 1, 1);
-		// g2d.fillRoundRect(3, 3, 4, 4, 1, 1);
-		// } else if (lastStepRight) {
-		// g2d.drawRoundRect(w - 8, h - 7, 4, 4, 1, 1);
-		// g2d.fillRoundRect(w - 8, h - 7, 4, 4, 1, 1);
-		// } else {
-		// g2d.drawRoundRect(w - 7, h - 8, 4, 4, 1, 1);
-		// g2d.fillRoundRect(w - 7, h - 8, 4, 4, 1, 1);
-		// }
-		//
-		// }
-		g.setColor(Color.BLACK);
 		repaint();
 	}
 
@@ -415,7 +402,6 @@ public class Train extends JPanel implements Runnable {
 			cX = x + w / 2;
 			cY = y + h / 2;
 		}
-
 		repaint();
 	}
 
@@ -441,7 +427,6 @@ public class Train extends JPanel implements Runnable {
 			cX = x + w / 2;
 			cY = y + h / 2;
 		}
-
 		repaint();
 	}
 
