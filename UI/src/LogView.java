@@ -1,3 +1,5 @@
+import java.awt.GridLayout;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -50,20 +52,17 @@ public class LogView extends JFrame {
 		setSize(500, 300);
 		setTitle("Log-File");
 		setLocationRelativeTo(null);
-		JPanel panel = new JPanel();
+		JPanel panel = new JPanel(new GridLayout(1, 1));
 
 		txtLog = new JTextArea();
-		txtLog.setBounds(1, 1, getWidth(), getHeight());
 		txtLog.setEditable(false);
 
 		// Adds a Scrollpane so that the user can look through older and newer
 		// information.
 		scrollPane = new JScrollPane(txtLog, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setBounds(5, 5, 475, 250);
-
+		scrollPane.setSize(this.getSize());
 		panel.add(scrollPane);
-		panel.setLayout(null);
 		setContentPane(panel);
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);

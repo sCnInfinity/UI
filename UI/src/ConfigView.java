@@ -1,21 +1,18 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * This class functions as a viewable configuration window.
@@ -27,9 +24,11 @@ public class ConfigView extends JFrame implements ActionListener {
 	/** Button to close the configuration window */
 	private JButton btnCloseConfig = new JButton("Speichern");
 	/** Button to select an image for a train */
-	private JButton btnSelectImage = new JButton("Durchsuchen");
+	private JButton btnSelectImage = new JButton("<html>Bild wählen</html>");
 	/** Contentpane */
-	private JPanel panel = new JPanel();
+	private JPanel panel = new JPanel(new BorderLayout());
+	private JPanel panelBot = new JPanel();
+	private JPanel panelTop = new JPanel();
 	/** Textfield to change a trains name */
 	private JTextField txtName = new JTextField();
 	/** Label to display a trains image */
@@ -70,7 +69,7 @@ public class ConfigView extends JFrame implements ActionListener {
 	private void buildWindow() {
 		setTitle("Eisenbahn: Konfiguration");
 		setContentPane(panel);
-		setSize(500, 300);
+		setSize(400, 300);
 		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
@@ -79,28 +78,33 @@ public class ConfigView extends JFrame implements ActionListener {
 						Controller.getListOfTrains().get(index).getName());
 			}
 		});
-		setVisible(true);
+		panelTop.setLayout(new GridLayout(1, 2, 5, 5));
+		panelTop.add(new JLabel(" Name"));
+		panelTop.add(txtName);
 
-		panel.add(btnCloseConfig);
-		panel.add(txtName);
-		panel.add(btnSelectImage);
 		// Read image from set Path
 		try {
-
 			imageLabel = new JLabel(prepareImage());
 			// adjust label size to image size
-			panel.add(imageLabel);
+			panel.add(new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png")).getImage()
+					.getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH))));
+			if (!imagePath.equals("") && imagePath != null)
+				panel.add(imageLabel);
+				
 		} catch (Exception e) {
-		}
 
-		txtName.setBounds(40, 40, 50, 20);
-		txtName.setText(data[0]);
+		}
+		panelBot.setLayout(new GridLayout(1, 2));
+		panelBot.add(btnSelectImage);
+		panelBot.add(btnCloseConfig);
+		panel.add(panelTop, BorderLayout.NORTH);
+		panel.add(panelBot, BorderLayout.SOUTH);
 
 		btnSelectImage.addActionListener(this);
-		btnSelectImage.setBounds(1, 90, 100, 20);
 
-		btnCloseConfig.setBounds(1, 1, (int) btnCloseConfig.getPreferredSize().getWidth(), 25);
 		btnCloseConfig.addActionListener(this);
+
+		setVisible(true);
 	}
 
 	public ImageIcon prepareImage() {
@@ -124,8 +128,6 @@ public class ConfigView extends JFrame implements ActionListener {
 		if (s == btnSelectImage) {
 			imagePath = Controller.selectImage(this);
 			imageLabel.setIcon(prepareImage());
-//			imageLabel.setI
-//			imageLabel = new JLabel(prepareImage());
 			panel.add(imageLabel);
 			revalidate();
 			repaint();
