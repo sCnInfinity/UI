@@ -43,7 +43,7 @@ public class Charger implements Runnable {
 				// Aktualisiert den Slider, wenn der im Control Panel
 				// ausgewählte Zug dem in diesem Thread bearbeiteten Zug
 				// entspricht
-				Controller.getCPanel().getSliders(index)[1].setValue(battery);
+				Controller.getCPanel().getProgressBars(index).setValue(battery);
 
 			} catch (InterruptedException e) {
 				e.printStackTrace();

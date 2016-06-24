@@ -121,7 +121,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				new Thread(tView).start();
 			}
 		});
-		
+
 	}
 
 	private void showLoadingScreen() {
@@ -210,9 +210,9 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 			cPanel.getTrainButtons(i)[0].addActionListener(this);
 			cPanel.getTrainButtons(i)[1].addActionListener(this);
 			cPanel.getTrainButtons(i)[2].addActionListener(this);
-			cPanel.getSliders(i)[0].addMouseListener(this);
-			cPanel.getSliders(i)[0].addChangeListener(this);
-			cPanel.getSliders(i)[1].addChangeListener(this);
+			cPanel.getSliders(i).addMouseListener(this);
+			cPanel.getSliders(i).addChangeListener(this);
+			cPanel.getProgressBars(i).addChangeListener(this);
 		}
 		cPanel.getBtnStopOnEmergency().addActionListener(this);
 
@@ -387,9 +387,9 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @category Setter
 	 */
 	private void resetSlider(int i) {
-		cPanel.getSliders(i)[0].setValue(0);
-		cPanel.getSliders(i)[0].setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i)[0].getValue() + " km/h");
-		cPanel.getLabelTempo(0).setText(cPanel.getSliders(i)[0].getValue() + "km/h");
+		cPanel.getSliders(i).setValue(0);
+		cPanel.getSliders(i).setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i).getValue() + " km/h");
+		cPanel.getLabelTempo(0).setText(cPanel.getSliders(i).getValue() + "km/h");
 	}
 
 	/**
@@ -583,8 +583,8 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		Object s = e.getSource();
 
 		for (int i = 0; i < listOfTrains.size(); i++) {
-			if (s == cPanel.getSliders(i)[0] && cPanel.getSliders(i)[0].isEnabled()) {
-				listOfTrains.get(i).setTempo(cPanel.getSliders(i)[0].getValue());
+			if (s == cPanel.getSliders(i)) {
+				listOfTrains.get(i).setTempo(cPanel.getSliders(i).getValue());
 				if (!listOfTrains.get(i).isRunning()) {
 					listOfTrains.get(i).setRunning(true);
 					if (listOfTrains.get(i).getBatteryLifeTime() > 5)
@@ -596,7 +596,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 					setDirectionButtons(true, false, false, true, i);
 			}
 		}
-
 	}
 
 	/**
@@ -608,13 +607,12 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	public void stateChanged(ChangeEvent e) {
 		Object s = e.getSource();
 		for (int i = 0; i < listOfTrains.size(); i++) {
-			if (s == cPanel.getSliders(i)[0]) {
-				cPanel.getSliders(i)[0]
-						.setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i)[0].getValue() + " km/h");
+			if (s == cPanel.getSliders(i)) {
+				cPanel.getSliders(i).setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i).getValue() + " km/h");
 				cPanel.getLabelTempo(i).setText(
-						"<html><p align ='center'>" + cPanel.getSliders(i)[0].getValue() + " <br>km/h</p></html>");
-			} else if (s == cPanel.getSliders(i)[1]) {
-				if (cPanel.getSliders(i)[1].getValue() == 0) {
+						"<html><p align ='center'>" + cPanel.getSliders(i).getValue() + " <br>km/h</p></html>");
+			} else if (s == cPanel.getProgressBars(i)) {
+				if (cPanel.getProgressBars(i).getValue() < 1) {
 					resetSlider(i);
 					listOfTrains.get(i).setTempo(0);
 					listOfTrains.get(i).setRunning(false);

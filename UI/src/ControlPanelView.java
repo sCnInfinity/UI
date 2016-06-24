@@ -1,4 +1,4 @@
-import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.GridLayout;
@@ -13,10 +13,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  * Diese Klasse wird als anzeigbares Control Panel für die Züge verwendet.
@@ -76,8 +78,9 @@ public class ControlPanelView extends JFrame {
 	private static ArrayList<JPanel> trainPanels = new ArrayList<>();
 	private static ArrayList<JToggleButton[]> trainToggleButtons = new ArrayList<>();
 	private static ArrayList<JButton[]> trainButtons = new ArrayList<>();
-	private static ArrayList<JSlider[]> trainSliders = new ArrayList<>();
+	private static ArrayList<JSlider> trainSliders = new ArrayList<>();
 	private static ArrayList<JLabel[]> trainLabels = new ArrayList<>();
+	private static ArrayList<JProgressBar> trainProgressBars = new ArrayList<>();
 
 	/**
 	 * Konstruktor. Übernimmt übergebene Komponenten und baut das Fenster über
@@ -136,10 +139,11 @@ public class ControlPanelView extends JFrame {
 			trainButtons.add(new JButton[] { new JButton(new ImageIcon(getClass().getResource("stop.png"))),
 					new JButton(new ImageIcon(getClass().getResource("battery.png"))),
 					new JButton(new ImageIcon(getClass().getResource("edit.png"))) });
-			trainSliders.add(new JSlider[] { new JSlider(SwingConstants.VERTICAL, 0, 200, 0),
-					new JSlider(SwingConstants.VERTICAL, 0, 100, 100) });
+			trainSliders.add(new JSlider(SwingConstants.VERTICAL, 0, 200, 0));
 			trainLabels.add(new JLabel[] { new JLabel(), new JLabel("Akku") });
-			trainLabels.get(i)[0].setText(trainSliders.get(i)[0].getValue() + "km/h");
+			trainLabels.get(i)[0].setText(trainSliders.get(i).getValue() + "km/h");
+			trainProgressBars.add(new JProgressBar(JProgressBar.VERTICAL, 0, 100));
+			trainProgressBars.get(i).setValue(100);
 		}
 
 		panel.add(panelTrainLeft);
@@ -151,9 +155,10 @@ public class ControlPanelView extends JFrame {
 			trainPanels.get(i).add(trainToggleButtons.get(i)[1]);
 			trainPanels.get(i).add(trainToggleButtons.get(i)[2]);
 			trainPanels.get(i).add(trainButtons.get(i)[0]);
-			trainPanels.get(i).add(trainSliders.get(i)[0]);
-			trainPanels.get(i).add(trainSliders.get(i)[1]);
-			trainSliders.get(i)[1].setEnabled(false);
+			trainPanels.get(i).add(trainSliders.get(i));
+			trainPanels.get(i).add(trainProgressBars.get(i));
+//			trainPanels.get(i).add(trainSliders.get(i)[1]);
+//			trainSliders.get(i)[1].setEnabled(false);
 			trainPanels.get(i).add(trainLabels.get(i)[0]);
 			trainPanels.get(i).add(trainLabels.get(i)[1]);
 			trainPanels.get(i).add(trainButtons.get(i)[1]);
@@ -165,7 +170,7 @@ public class ControlPanelView extends JFrame {
 		JMenuBar listenerBar = new JMenuBar();
 		JMenu listenerMenu = new JMenu();
 
-		getMenuItems()[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, Event.CTRL_MASK));
+		getMenuItems()[0].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK));
 		listenerMenu.add(getMenuItems()[0]);
 		getMenuItems()[1].setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.CTRL_MASK));
 		listenerMenu.add(getMenuItems()[1]);
@@ -187,7 +192,8 @@ public class ControlPanelView extends JFrame {
 		setTitle("Control-Panel");
 		setMinimumSize(new Dimension(700, 400));
 		// Fenster in der Mitte des Bildschirms anzeigen
-		setLocationRelativeTo(null);
+		// setLocationRelativeTo(null);
+		setLocation(600, 300);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		setContentPane(panel);
@@ -228,7 +234,11 @@ public class ControlPanelView extends JFrame {
 		return trainButtons.get(i);
 	}
 
-	public JSlider[] getSliders(int i) {
+	public JProgressBar getProgressBars(int i){
+		return trainProgressBars.get(i);
+	}
+	
+	public JSlider getSliders(int i) {
 		return trainSliders.get(i);
 	}
 

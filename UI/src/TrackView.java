@@ -51,7 +51,7 @@ public class TrackView extends JFrame implements Runnable {
 
 		JPanel panelLeft = new JPanel();
 		panelLeft.setLayout(null);
-		JPanel panelRight = new JPanel(new GridLayout(5,3, 5, 5));
+		JPanel panelRight = new JPanel(new GridLayout(5, 3, 5, 5));
 
 		setTitle("Modelleisenbahn: Smulation");
 		setResizable(false);
@@ -72,14 +72,12 @@ public class TrackView extends JFrame implements Runnable {
 		icon = new ImageIcon(img);
 		labelsImg[0] = new JLabel(icon);
 		panelRight.add(labelsImg[0]);
-		
+
 		JLabel[] labelsColor = new JLabel[Controller.getListOfTrains().size()];
 		labelsColor[0] = new JLabel();
 		labelsColor[0].setBackground(colors[0]);
 		labelsColor[0].setOpaque(true);
 		panelRight.add(labelsColor[0]);
-
-		
 
 		for (int j = 0; j < Controller.getListOfTrains().size(); j++) {
 			panelLeft.add(Controller.getListOfTrains().get(j));
@@ -97,13 +95,11 @@ public class TrackView extends JFrame implements Runnable {
 			labelsImg[i] = new JLabel(new ImageIcon(new ImageIcon(Controller.getListOfTrains().get(i).getImagePath())
 					.getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
 			panelRight.add(labelsImg[i]);
-			
+
 			labelsColor[i] = new JLabel();
 			labelsColor[i].setBackground(colors[i]);
 			labelsColor[i].setOpaque(true);
 			panelRight.add(labelsColor[i]);
-
-			
 		}
 
 		tDraw.setBounds(0, 0, panelLeft.getWidth(), panelLeft.getHeight());

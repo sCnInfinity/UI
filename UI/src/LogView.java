@@ -51,7 +51,7 @@ public class LogView extends JFrame {
 	private void buildWindow() {
 		setSize(500, 300);
 		setTitle("Log-File");
-		setLocationRelativeTo(null);
+		setLocation(600, 0);
 		JPanel panel = new JPanel(new GridLayout(1, 1));
 
 		txtLog = new JTextArea();

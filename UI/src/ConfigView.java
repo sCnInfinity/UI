@@ -33,6 +33,9 @@ public class ConfigView extends JFrame implements ActionListener {
 	private JTextField txtName = new JTextField();
 	/** Label to display a trains image */
 	private JLabel imageLabel;
+	/** */
+	private JLabel lblImageMissing = new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png")).getImage()
+			.getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH)));
 	/** Number to match a configuration window to a train */
 	private int index;
 	/** Path to the location of a trains image */
@@ -79,18 +82,17 @@ public class ConfigView extends JFrame implements ActionListener {
 			}
 		});
 		panelTop.setLayout(new GridLayout(1, 2, 5, 5));
-		panelTop.add(new JLabel(" Name"));
+		panelTop.add(new JLabel(" Name eingeben"));
 		panelTop.add(txtName);
 
 		// Read image from set Path
 		try {
 			imageLabel = new JLabel(prepareImage());
 			// adjust label size to image size
-			panel.add(new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png")).getImage()
-					.getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH))));
-			if (!imagePath.equals("") && imagePath != null)
-				panel.add(imageLabel);
-				
+			panel.add(imageLabel);
+			if (imageLabel.getIcon().getIconWidth()<0)
+				panel.add(lblImageMissing);
+
 		} catch (Exception e) {
 
 		}
@@ -129,6 +131,7 @@ public class ConfigView extends JFrame implements ActionListener {
 			imagePath = Controller.selectImage(this);
 			imageLabel.setIcon(prepareImage());
 			panel.add(imageLabel);
+			panel.remove(lblImageMissing);
 			revalidate();
 			repaint();
 		}

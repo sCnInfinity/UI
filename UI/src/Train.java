@@ -318,7 +318,7 @@ public class Train extends JPanel implements Runnable {
 			}
 			try {
 				Thread.sleep(500 / tempo);
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

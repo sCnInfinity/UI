@@ -42,7 +42,7 @@ public class Counter implements Runnable {
 				battery = battery - 5;
 				Controller.getListOfTrains().get(index).setBatteryLifeTime(battery);
 				// Update Slider if indizes match
-				Controller.getCPanel().getSliders(index)[1].setValue(battery);
+				Controller.getCPanel().getProgressBars(index).setValue(battery);
 				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
