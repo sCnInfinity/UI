@@ -255,14 +255,15 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @param oldName
 	 *            Alter Zugname für Vergleiche
 	 */
-	public static void closeConfig(int index, String imagePath, String trainName, String oldName) {
+	public static void closeConfig(int index, String imagePath, boolean isBatteryPowered,String trainName, String oldName) {
 		cPanel.setFocusableWindowState(true);
 		cPanel.setEnabled(true);
 		config.dispose();
 		listOfTrains.get(index).setName(trainName, oldName);
+		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
 		writeConfigDataToFile(index, imagePath, trainName);
 		tView.getLabelsImg()[index].setIcon(new ImageIcon(
-				new ImageIcon(imagePath).getImage().getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH)));
+				new ImageIcon(imagePath).getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
 	}
 
 	/**

@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -34,8 +35,9 @@ public class ConfigView extends JFrame implements ActionListener {
 	/** Label to display a trains image */
 	private JLabel imageLabel;
 	/** */
-	private JLabel lblImageMissing = new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png")).getImage()
-			.getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH)));
+	private JLabel lblImageMissing = new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png"))
+			.getImage().getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH)));
+	private JCheckBox cBoxBatteryPowered = new JCheckBox();
 	/** Number to match a configuration window to a train */
 	private int index;
 	/** Path to the location of a trains image */
@@ -77,20 +79,24 @@ public class ConfigView extends JFrame implements ActionListener {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
 				Controller.closeConfig(index, Controller.getListOfTrains().get(index).getImagePath(),
+						Controller.getListOfTrains().get(index).isBatteryPowered(),
 						Controller.getListOfTrains().get(index).getName(),
 						Controller.getListOfTrains().get(index).getName());
 			}
 		});
-		panelTop.setLayout(new GridLayout(1, 2, 5, 5));
+		panelTop.setLayout(new GridLayout(2, 2, 5, 5));
 		panelTop.add(new JLabel(" Name eingeben"));
 		panelTop.add(txtName);
+		panelTop.add(new JLabel(" Batteriebetrieben"));
+		panelTop.add(cBoxBatteryPowered);
+		
 
 		// Read image from set Path
 		try {
 			imageLabel = new JLabel(prepareImage());
 			// adjust label size to image size
 			panel.add(imageLabel);
-			if (imageLabel.getIcon().getIconWidth()<0)
+			if (imageLabel.getIcon().getIconWidth() < 0)
 				panel.add(lblImageMissing);
 
 		} catch (Exception e) {
@@ -141,7 +147,7 @@ public class ConfigView extends JFrame implements ActionListener {
 			if (txtName.getText().equals("")) {
 				JOptionPane.showMessageDialog(this, "Der Name muss mindestens ein Zeichen enthalten.");
 			} else
-				Controller.closeConfig(index, imagePath, txtName.getText(), oldName);
+				Controller.closeConfig(index, imagePath, cBoxBatteryPowered.isSelected(),txtName.getText(), oldName);
 		}
 
 	}

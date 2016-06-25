@@ -39,11 +39,16 @@ public class Counter implements Runnable {
 				// Sleep to give user time to react.
 				Thread.sleep(2000);
 				// Decreases Battery Lifetime
-				battery = battery - 5;
+				if (Controller.getListOfTrains().get(index).isBatteryPowered()) {
+					battery = battery - 5;
+				} else {
+					battery = 100;
+				}
+
 				Controller.getListOfTrains().get(index).setBatteryLifeTime(battery);
 				// Update Slider if indizes match
 				Controller.getCPanel().getProgressBars(index).setValue(battery);
-				
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -55,11 +60,11 @@ public class Counter implements Runnable {
 						Controller.getListOfTrains().get(index).getName() + ": " + battery + "% Batterieleistung");
 		}
 		// Write Message to the Temporary Log Display if battery is empty
-		if (battery < 5){
+		if (battery < 5) {
 			Controller.getListOfTrains().get(index).setRunning(false);
 			Controller.getListOfTrains().get(index).setTempo(0);
 			Controller.getLogView().updateLog(Controller.getListOfTrains().get(index).getName() + ": Batterie leer.");
 		}
-			
+
 	}
 }

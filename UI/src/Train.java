@@ -33,6 +33,7 @@ public class Train extends JPanel implements Runnable {
 	private boolean running;
 	/** to check, whether train is charging */
 	private boolean charging;
+	private boolean poweredByBattery;
 	private String imagePath;
 	private double rotation = 0;
 	private double rotationChange = 4.5;
@@ -101,6 +102,18 @@ public class Train extends JPanel implements Runnable {
 		if (!oldName.equals(name)) {
 			Controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
 		}
+	}
+
+	public void setBatteryMode(boolean mode) {
+		poweredByBattery = mode;
+		if (poweredByBattery)
+			Controller.getLogView().updateLog(name + " wird nun per Batterie betrieben.");
+		else
+			Controller.getLogView().updateLog(name + " ist nun ans Stromnetz angeschlossen.");
+	}
+
+	public boolean isBatteryPowered() {
+		return poweredByBattery;
 	}
 
 	public String getImagePath() {
