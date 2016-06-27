@@ -42,7 +42,7 @@ public class BatteryWorker implements Runnable {
 				// lifetime
 				// >= 1
 				while (battery > 1 && !con.getListOfTrains().get(index).isCharging()
-						&& con.getListOfTrains().get(index).isRunning()) {
+						&& con.getListOfTrains().get(index).isRunning() && con.getListOfTrains().get(index).isBatteryPowered()) {
 					try {
 						// Sleep to give user time to react.
 						Thread.sleep(2000);
@@ -101,7 +101,5 @@ public class BatteryWorker implements Runnable {
 				con.getListOfTrains().get(index).setCharging(false);
 			}
 		}
-		
-
 	}
 }

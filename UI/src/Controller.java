@@ -209,11 +209,14 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 *            Alter Zugname für Vergleiche
 	 */
 	public void closeConfig(int index, String imagePath, boolean isBatteryPowered, String trainName, String oldName) {
+		boolean oldBatteryMode = listOfTrains.get(index).isBatteryPowered();
 		cPanel.setFocusableWindowState(true);
 		cPanel.setEnabled(true);
 		config.dispose();
+		if(!oldBatteryMode && isBatteryPowered)startBatteryWorker(index, false);
 		listOfTrains.get(index).setName(trainName, oldName);
 		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
+		System.out.println(""+isBatteryPowered);
 		cPanel.getTrainButtons(index)[1].setEnabled(isBatteryPowered);
 		writeConfigDataToFile(index, imagePath, trainName);
 		tView.getLabelsImg()[index].setIcon(new ImageIcon(
