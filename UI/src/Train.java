@@ -15,6 +15,7 @@ import javax.swing.JPanel;
  * @author Lucas Groß-Hardt
  */
 public class Train extends JPanel implements Runnable {
+	private Controller controller;
 	/** Name of the train */
 	private String name;
 	/** False = light turned off, true = light turned on */
@@ -58,10 +59,11 @@ public class Train extends JPanel implements Runnable {
 	 *            counter
 	 * @category Constructor
 	 */
-	public Train(String name, int index) {
+	public Train(String name, int index, Controller con) {
+		this.controller = con;
 		try {
 			this.index = index;
-			String[] data = Controller.readDataOnOpen(this.index);
+			String[] data = con.readDataOnOpen(this.index);
 			imagePath = data[1];
 		} catch (Exception e) {
 		}
@@ -100,16 +102,16 @@ public class Train extends JPanel implements Runnable {
 		this.name = name;
 		// Only display name changes if the old name differs from the new one
 		if (!oldName.equals(name)) {
-			Controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
+			controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
 		}
 	}
 
 	public void setBatteryMode(boolean mode) {
 		poweredByBattery = mode;
 		if (poweredByBattery)
-			Controller.getLogView().updateLog(name + " wird nun per Batterie betrieben.");
+			controller.getLogView().updateLog(name + " wird nun per Batterie betrieben.");
 		else
-			Controller.getLogView().updateLog(name + " ist nun ans Stromnetz angeschlossen.");
+			controller.getLogView().updateLog(name + " ist nun ans Stromnetz angeschlossen.");
 	}
 
 	public boolean isBatteryPowered() {
@@ -167,11 +169,11 @@ public class Train extends JPanel implements Runnable {
 		if (direction.equals("forward")) {
 			forward = true;
 			backward = false;
-			Controller.getLogView().updateLog(name + " fährt nun vorwärts ");
+			controller.getLogView().updateLog(name + " fährt nun vorwärts ");
 		} else if (direction.equals("backward")) {
 			backward = true;
 			forward = false;
-			Controller.getLogView().updateLog(name + " fährt nun rückwärts ");
+			controller.getLogView().updateLog(name + " fährt nun rückwärts ");
 		}
 	}
 
@@ -206,7 +208,7 @@ public class Train extends JPanel implements Runnable {
 	 */
 	public void setRunning(boolean running) {
 		if (battery < 1 && !this.running && running)
-			Controller.getLogView().updateLog(name + ": Nicht ausreichend geladen.");
+			controller.getLogView().updateLog(name + ": Nicht ausreichend geladen.");
 		else
 			this.running = running;
 	}
@@ -248,16 +250,16 @@ public class Train extends JPanel implements Runnable {
 		boolean tmp = light;
 		if (status) {
 			if (battery > 0) {
-				Controller.getLogView().updateLog(name + ": Licht an");
+				controller.getLogView().updateLog(name + ": Licht an");
 				light = status;
 			} else {
-				Controller.getLogView().updateLog(name + ": Nicht ausreichend geladen.");
+				controller.getLogView().updateLog(name + ": Nicht ausreichend geladen.");
 				light = false;
 			}
 		} else {
 			// only display log info if the state is changed
 			if (!(tmp == status)) {
-				Controller.getLogView().updateLog(name + ": Licht aus");
+				controller.getLogView().updateLog(name + ": Licht aus");
 				light = status;
 			}
 		}
@@ -284,7 +286,7 @@ public class Train extends JPanel implements Runnable {
 	public void setTempo(int tempo) {
 		this.tempo = tempo;
 		if (battery > 1) {
-			Controller.getLogView().updateLog(name + " fährt jetzt mit einer Geschwindigkeit von " + tempo + " km/h.");
+			controller.getLogView().updateLog(name + " fährt jetzt mit einer Geschwindigkeit von " + tempo + " km/h.");
 		}
 	}
 

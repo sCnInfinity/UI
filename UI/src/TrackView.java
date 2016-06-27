@@ -11,12 +11,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class TrackView extends JFrame implements Runnable {
+	private Controller con;
 	private static Color[] colors;
 	private String[] colorNames;
 	private JLabel[] labelsImg;
 
-	public TrackView() {
-
+	public TrackView(Controller controller) {
+		con = controller;
 	}
 
 	public static Color getColors(int index) {
@@ -29,8 +30,8 @@ public class TrackView extends JFrame implements Runnable {
 
 	@Override
 	public void run() {
-		colors = new Color[Controller.getListOfTrains().size()];
-		for (int i = 0; i < Controller.getListOfTrains().size(); i++) {
+		colors = new Color[con.getListOfTrains().size()];
+		for (int i = 0; i < con.getListOfTrains().size(); i++) {
 			if (i > 3) {
 				Random rand = new Random();
 				float r = rand.nextFloat();
@@ -61,38 +62,37 @@ public class TrackView extends JFrame implements Runnable {
 		getContentPane().setLayout(new BorderLayout());
 		panelLeft.add(tDraw);
 
-		JLabel[] labelsName = new JLabel[Controller.getListOfTrains().size()];
-		labelsName[0] = new JLabel(Controller.getListOfTrains().get(0).getName() + " ");
+		JLabel[] labelsName = new JLabel[con.getListOfTrains().size()];
+		labelsName[0] = new JLabel(con.getListOfTrains().get(0).getName() + " ");
 		panelRight.add(labelsName[0]);
 
-		labelsImg = new JLabel[Controller.getListOfTrains().size()];
-		ImageIcon icon = new ImageIcon(Controller.getListOfTrains().get(0).getImagePath());
+		labelsImg = new JLabel[con.getListOfTrains().size()];
+		ImageIcon icon = new ImageIcon(con.getListOfTrains().get(0).getImagePath());
 		Image img = icon.getImage();
 		img = img.getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH);
 		icon = new ImageIcon(img);
 		labelsImg[0] = new JLabel(icon);
 		panelRight.add(labelsImg[0]);
 
-		JLabel[] labelsColor = new JLabel[Controller.getListOfTrains().size()];
+		JLabel[] labelsColor = new JLabel[con.getListOfTrains().size()];
 		labelsColor[0] = new JLabel();
 		labelsColor[0].setBackground(colors[0]);
 		labelsColor[0].setOpaque(true);
 		panelRight.add(labelsColor[0]);
 
-		for (int j = 0; j < Controller.getListOfTrains().size(); j++) {
-			panelLeft.add(Controller.getListOfTrains().get(j));
-			new Thread(Controller.getListOfTrains().get(j)).start();
+		for (int j = 0; j < con.getListOfTrains().size(); j++) {
+			panelLeft.add(con.getListOfTrains().get(j));
+			new Thread(con.getListOfTrains().get(j)).start();
 		}
 		getContentPane().add(panelLeft);
 		getContentPane().add(panelRight, BorderLayout.EAST);
 		pack();
-		setVisible(true);
 
-		for (int i = 1; i < Controller.getListOfTrains().size(); i++) {
-			labelsName[i] = new JLabel(Controller.getListOfTrains().get(i).getName() + " ");
+		for (int i = 1; i < con.getListOfTrains().size(); i++) {
+			labelsName[i] = new JLabel(con.getListOfTrains().get(i).getName() + " ");
 			panelRight.add(labelsName[i]);
 
-			labelsImg[i] = new JLabel(new ImageIcon(new ImageIcon(Controller.getListOfTrains().get(i).getImagePath())
+			labelsImg[i] = new JLabel(new ImageIcon(new ImageIcon(con.getListOfTrains().get(i).getImagePath())
 					.getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
 			panelRight.add(labelsImg[i]);
 
@@ -104,14 +104,14 @@ public class TrackView extends JFrame implements Runnable {
 
 		tDraw.setBounds(0, 0, panelLeft.getWidth(), panelLeft.getHeight());
 		while (true) {
-			for (int i = 0; i < Controller.getListOfTrains().size(); i++) {
-				int x = Controller.getListOfTrains().get(i).getPositionParameters()[0];
-				int y = Controller.getListOfTrains().get(i).getPositionParameters()[1];
-				int w = Controller.getListOfTrains().get(i).getPositionParameters()[2];
-				int h = Controller.getListOfTrains().get(i).getPositionParameters()[3];
-				Controller.getListOfTrains().get(i).setBounds(x, y, w, h);
-				Controller.getListOfTrains().get(i).setOpaque(false);
-				labelsName[i].setText(Controller.getListOfTrains().get(i).getName());
+			for (int i = 0; i < con.getListOfTrains().size(); i++) {
+				int x = con.getListOfTrains().get(i).getPositionParameters()[0];
+				int y = con.getListOfTrains().get(i).getPositionParameters()[1];
+				int w = con.getListOfTrains().get(i).getPositionParameters()[2];
+				int h = con.getListOfTrains().get(i).getPositionParameters()[3];
+				con.getListOfTrains().get(i).setBounds(x, y, w, h);
+				con.getListOfTrains().get(i).setOpaque(false);
+				labelsName[i].setText(con.getListOfTrains().get(i).getName());
 			}
 		}
 

@@ -66,7 +66,6 @@ public class LogView extends JFrame {
 		setContentPane(panel);
 		setResizable(false);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
 	}
 
 }

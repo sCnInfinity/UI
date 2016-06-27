@@ -57,30 +57,30 @@ public class ControlPanelView extends JFrame {
 	private JLabel lblSwitch3 = new JLabel("Weiche 3");
 
 	/** Menüitem zur Shortcut-Anbindung (Alle Züge stoppen) */
-	private static JMenuItem itemStopAll = new JMenuItem();
+	private JMenuItem itemStopAll = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 1 links) */
-	private static JMenuItem itemSwitch1Left = new JMenuItem();
+	private JMenuItem itemSwitch1Left = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 1 rechts) */
-	private static JMenuItem itemSwitch1Right = new JMenuItem();
+	private JMenuItem itemSwitch1Right = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 2 links) */
-	private static JMenuItem itemSwitch2Left = new JMenuItem();
+	private JMenuItem itemSwitch2Left = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 2 rechts) */
-	private static JMenuItem itemSwitch2Right = new JMenuItem();
+	private JMenuItem itemSwitch2Right = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 3 links) */
-	private static JMenuItem itemSwitch3Left = new JMenuItem();
+	private JMenuItem itemSwitch3Left = new JMenuItem();
 	/** Menüitem zur Shortcut-Anbindung (Weiche 3 rechts) */
-	private static JMenuItem itemSwitch3Right = new JMenuItem();
+	private JMenuItem itemSwitch3Right = new JMenuItem();
 
 	/** Number of trains to be created */
 	private int numberOfTrains;
 	/** String array to store the names of all trains created */
 	private String[] trains;
-	private static ArrayList<JPanel> trainPanels = new ArrayList<>();
-	private static ArrayList<JToggleButton[]> trainToggleButtons = new ArrayList<>();
-	private static ArrayList<JButton[]> trainButtons = new ArrayList<>();
-	private static ArrayList<JSlider> trainSliders = new ArrayList<>();
-	private static ArrayList<JLabel[]> trainLabels = new ArrayList<>();
-	private static ArrayList<JProgressBar> trainProgressBars = new ArrayList<>();
+	private ArrayList<JPanel> trainPanels = new ArrayList<>();
+	private ArrayList<JToggleButton[]> trainToggleButtons = new ArrayList<>();
+	private ArrayList<JButton[]> trainButtons = new ArrayList<>();
+	private ArrayList<JSlider> trainSliders = new ArrayList<>();
+	private ArrayList<JLabel[]> trainLabels = new ArrayList<>();
+	private ArrayList<JProgressBar> trainProgressBars = new ArrayList<>();
 
 	/**
 	 * Konstruktor. Übernimmt übergebene Komponenten und baut das Fenster über
@@ -161,6 +161,7 @@ public class ControlPanelView extends JFrame {
 //			trainSliders.get(i)[1].setEnabled(false);
 			trainPanels.get(i).add(trainLabels.get(i)[0]);
 			trainPanels.get(i).add(trainLabels.get(i)[1]);
+			trainButtons.get(i)[1].setEnabled(false);
 			trainPanels.get(i).add(trainButtons.get(i)[1]);
 			trainPanels.get(i).add(trainButtons.get(i)[2]);
 			panel.add(trainPanels.get(i));
@@ -199,7 +200,6 @@ public class ControlPanelView extends JFrame {
 		setContentPane(panel);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setJMenuBar(listenerBar);
-		setVisible(true);
 
 		btnSwitch1Left.setEnabled(false);
 		btnSwitch1Left.setSelected(true);

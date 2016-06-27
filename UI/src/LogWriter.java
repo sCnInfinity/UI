@@ -11,10 +11,15 @@ import java.nio.file.Paths;
  *
  */
 public class LogWriter implements Runnable{
-
+	private Controller con;
 	/**
 	 * Run-Methode. Wird ausgeführt, wenn ein Thread
-	 */
+	*/
+	
+	public LogWriter(Controller con){
+		this.con = con;
+	}
+	
 	@Override
 	public void run() {
 		while(true){
@@ -23,7 +28,7 @@ public class LogWriter implements Runnable{
 			} catch (InterruptedException e3) {
 				e3.printStackTrace();
 			}
-			String textToSave = Controller.getLogView().getLogFile().getText();
+			String textToSave = con.getLogView().getLogFile().getText();
 			String[] parts = textToSave.split("\\n");
 			Path path = Paths.get("C:/Users/Lucas/Desktop/Log.txt");
 			try {

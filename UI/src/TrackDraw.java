@@ -9,6 +9,5 @@ public class TrackDraw extends JComponent {
 		g.drawRoundRect(44, 40, 369, 373, 120, 120);
 		g.drawRoundRect(66, 65, 323, 323, 100, 100);
 		g.setColor(Color.BLACK);
-
 	}
 }

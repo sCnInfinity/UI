@@ -1,5 +1,3 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,11 +17,6 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JWindow;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -37,23 +30,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class Controller implements ActionListener, ChangeListener, MouseListener {
 	/** Log-Fenster */
-	public static LogView lView;
+	public LogView lView;
 	/** Liste, die alle erzeugten Züge enthält */
-	private static ArrayList<Train> listOfTrains = new ArrayList<>();
+	private ArrayList<Train> listOfTrains = new ArrayList<>();
 	/** Anzahl der Züge, die erstellt werden sollen */
-	private static final int numberOfTrains = 4;
+	private final int numberOfTrains = 4;
 	/** Control panel (Hauptfenster) */
-	private static ControlPanelView cPanel;
+	private ControlPanelView cPanel;
 	/** Konfigurationsfenster */
-	private static ConfigView config;
+	private ConfigView config;
 	/** Weiche 1 */
-	private static Switch switch1;
+	private Switch switch1;
 	/** Weiche 2 */
-	private static Switch switch2;
+	private Switch switch2;
 	/** Weiche 3 */
-	private static Switch switch3;
+	private Switch switch3;
 
-	private static TrackView tView = new TrackView();
+	private TrackView tView;
 
 	/**
 	 * Gibt das Log-Fenster zurück, das im Controller erzeugt wird.
@@ -61,8 +54,13 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return Log-Fenster
 	 * @category Getter
 	 */
-	public static LogView getLogView() {
+	public LogView getLogView() {
 		return lView;
+	}
+
+	public void setCPanel(ControlPanelView cPanel) {
+		this.cPanel = cPanel;
+		prepareControlPanel();
 	}
 
 	/**
@@ -71,8 +69,14 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return Control panel
 	 * @category Getter
 	 */
-	public static ControlPanelView getCPanel() {
+	public ControlPanelView getCPanel() {
 		return cPanel;
+	}
+
+	public void setTrackView(TrackView tView) {
+		// TODO Auto-generated method stub
+		this.tView = tView;
+	
 	}
 
 	/**
@@ -81,7 +85,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return Liste aller Züge
 	 * @category Getter
 	 */
-	public static ArrayList<Train> getListOfTrains() {
+	public ArrayList<Train> getListOfTrains() {
 		return listOfTrains;
 	}
 
@@ -95,61 +99,24 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @category Constructor
 	 */
 	public Controller() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		switch1 = new Switch(1);
-		switch2 = new Switch(2);
-		switch3 = new Switch(3);
-		showLoadingScreen();
+		switch1 = new Switch(1, this);
+		switch2 = new Switch(2, this);
+		switch3 = new Switch(3, this);
 
 		for (int i = 0; i < numberOfTrains; i++) {
 			String[] input = readDataOnOpen(i);
 			if (input[0] != "") {
-				listOfTrains.add(new Train(input[0], i));
+				listOfTrains.add(new Train(input[0], i, this));
 			} else {
-				listOfTrains.add(new Train("Zug " + i, i));
+				listOfTrains.add(new Train("Zug " + i, i, this));
 			}
 		}
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				prepareLogView();
-				prepareControlPanel();
-				new Thread(new LogWriter()).start();
-				new Thread(tView).start();
-			}
-		});
-
 	}
 
-	private void showLoadingScreen() {
-		JWindow loadingScreen = new JWindow();
-		JPanel content = new JPanel(new BorderLayout());
-		JProgressBar progressBar = new JProgressBar(0, 100);
-
-		content.add(new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("loadingScreenBG.jpg")).getImage()
-				.getScaledInstance(300, 200, java.awt.Image.SCALE_SMOOTH))), BorderLayout.CENTER);
-		content.add(progressBar, BorderLayout.SOUTH);
-
-		loadingScreen.add(content);
-		loadingScreen.pack();
-		loadingScreen.setLocationRelativeTo(null);
-
-		progressBar.setStringPainted(true);
-		loadingScreen.setVisible(true);
-		for (int i = 0; i < 100; i++) {
-			progressBar.setValue(i);
-			progressBar.setString(i + "%");
-			try {
-				Thread.sleep(20);
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		loadingScreen.dispose();
+	public void setLogView(LogView lView) {
+		this.lView = lView;
+		prepareLogView();
+		new Thread(new LogWriter(this)).start();
 	}
 
 	/**
@@ -161,13 +128,8 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @param charge
 	 *            Parameter, der anzeigt, ob ein Zug aufgeladen wird.
 	 */
-	public void startThread(int index, boolean charge) {
-		if (charge)
-			new Thread(new Charger(index)).start();
-		else {
-			listOfTrains.get(index).setCharging(false);
-			new Thread(new Counter(index)).start();
-		}
+	public void startBatteryWorker(int index, boolean charge) {
+		new Thread(new BatteryWorker(index, this, charge)).start();
 	}
 
 	/**
@@ -175,7 +137,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * vom Desktop in das neu gestartete Log-Fenster.
 	 */
 	public void prepareLogView() {
-		lView = new LogView();
 		String line;
 		try {
 			BufferedReader br = new BufferedReader(
@@ -189,7 +150,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		lView.updateLog("  \n------ Neue Session -------");
 		lView.updateLog("Neues ControlPanel geöffnet");
 		lView.updateLog("Allen Weiche sind standardmäßig nach links ausgerichtet.");
-		lView.updateLog(Controller.getListOfTrains().get(0).getName() + " wird jetzt gesteuert");
 	}
 
 	/**
@@ -200,9 +160,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * setAcceleratior). Fügt die JMenuBar dem Control Panel hinzu.
 	 */
 	public void prepareControlPanel() {
-		// create control panel
-		cPanel = new ControlPanelView(numberOfTrains);
-		// add all Listeners
 		for (int i = 0; i < listOfTrains.size(); i++) {
 			cPanel.getTrainToggleButtons(i)[0].addActionListener(this);
 			cPanel.getTrainToggleButtons(i)[1].addActionListener(this);
@@ -235,11 +192,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	public void openConfig(int index) {
 		cPanel.setFocusableWindowState(false);
 		cPanel.setEnabled(false);
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				config = new ConfigView(index);
-			}
-		});
+		config = new ConfigView(index, this);
 	}
 
 	/**
@@ -255,12 +208,13 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @param oldName
 	 *            Alter Zugname für Vergleiche
 	 */
-	public static void closeConfig(int index, String imagePath, boolean isBatteryPowered,String trainName, String oldName) {
+	public void closeConfig(int index, String imagePath, boolean isBatteryPowered, String trainName, String oldName) {
 		cPanel.setFocusableWindowState(true);
 		cPanel.setEnabled(true);
 		config.dispose();
 		listOfTrains.get(index).setName(trainName, oldName);
 		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
+		cPanel.getTrainButtons(index)[1].setEnabled(isBatteryPowered);
 		writeConfigDataToFile(index, imagePath, trainName);
 		tView.getLabelsImg()[index].setIcon(new ImageIcon(
 				new ImageIcon(imagePath).getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
@@ -274,7 +228,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return String, der alle Informationen zum Zug enthält
 	 * @category Getter
 	 */
-	public static String readDataFromFile(int index) {
+	public String readDataFromFile(int index) {
 		String line;
 		String output = "";
 		try {
@@ -301,7 +255,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return Array mit Informationen (0 Name, 1 ImagePath)
 	 * @category Getter
 	 */
-	public static String[] readDataOnOpen(int index) {
+	public String[] readDataOnOpen(int index) {
 		String[] parts = new String[5];
 		try {
 			parts = readDataFromFile(index).split(";");
@@ -319,7 +273,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @return String Bild-Dateipfad
 	 * @category Getter
 	 */
-	public static String selectImage(Component comp) {
+	public String selectImage(Component comp) {
 		JFileChooser fc = new JFileChooser();
 		fc.setDialogTitle("Bild auswählen..");
 		// Filter hinzufüügen, um nur PNG, JPG und GIF zuzulassen
@@ -350,7 +304,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 *            Name des Zuges
 	 * @category Setter
 	 */
-	public static void writeConfigDataToFile(int index, String imagePath, String trainName) {
+	public void writeConfigDataToFile(int index, String imagePath, String trainName) {
 		// Es wird pro Index, also pro Zug, eine Texdatei erstellt.
 		Path path = Paths.get("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt");
 		try {
@@ -369,15 +323,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 			e2.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * Main-Methode. Erstellt einen neuen Controller. Dies startet das Programm.
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Controller controller = new Controller();
 	}
 
 	/**
@@ -413,7 +358,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				listOfTrains.get(i).setTempo(0);
 				listOfTrains.get(i).setCharging(true);
 				resetSlider(i);
-				startThread(i, true);
+				startBatteryWorker(i, true);
 
 			}
 			// Button Vorwärts
@@ -422,7 +367,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				if (!listOfTrains.get(i).isRunning()) {
 					listOfTrains.get(i).setRunning(true);
 					if (listOfTrains.get(i).getBatteryLifeTime() > 5) {
-						startThread(i, false);
+						startBatteryWorker(i, false);
 					}
 				}
 				setDirectionButtons(false, true, true, false, i);
@@ -432,7 +377,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				if (!listOfTrains.get(i).isRunning()) {
 					listOfTrains.get(i).setRunning(true);
 					if (listOfTrains.get(i).getBatteryLifeTime() > 5) {
-						startThread(i, false);
+						startBatteryWorker(i, false);
 					}
 				}
 				listOfTrains.get(i).setDirection("backward");
@@ -441,11 +386,11 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 			}
 			// Button Licht
 			else if (s == cPanel.getTrainToggleButtons(i)[1]) {
-				if (!Controller.getListOfTrains().get(i).lightIsOn()) {
+				if (!getListOfTrains().get(i).lightIsOn()) {
 					if (!listOfTrains.get(i).isRunning()) {
 						listOfTrains.get(i).setRunning(true);
 						if (listOfTrains.get(i).getBatteryLifeTime() > 5) {
-							startThread(i, false);
+							startBatteryWorker(i, false);
 						}
 					}
 					cPanel.getTrainToggleButtons(i)[1].setSelected(true);
@@ -589,7 +534,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				if (!listOfTrains.get(i).isRunning()) {
 					listOfTrains.get(i).setRunning(true);
 					if (listOfTrains.get(i).getBatteryLifeTime() > 5)
-						startThread(i, false);
+						startBatteryWorker(i, false);
 				}
 				if (listOfTrains.get(i).getDirection().equals("forward"))
 					setDirectionButtons(false, true, true, false, i);

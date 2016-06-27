@@ -22,6 +22,7 @@ import javax.swing.JTextField;
  * @category View
  */
 public class ConfigView extends JFrame implements ActionListener {
+	private Controller con;
 	/** Button to close the configuration window */
 	private JButton btnCloseConfig = new JButton("Speichern");
 	/** Button to select an image for a train */
@@ -55,16 +56,17 @@ public class ConfigView extends JFrame implements ActionListener {
 	 *            Number to match the configuration window
 	 * @category Constructor
 	 */
-	public ConfigView(int index) {
+	public ConfigView(int index, Controller con) {
+		this.con = con;
 		this.index = index;
 		try {
-			data = Controller.readDataOnOpen(this.index);
+			data = con.readDataOnOpen(this.index);
 			txtName.setText(data[0]);
 			imagePath = data[1];
 		} catch (Exception e) {
 		}
 		// set a value for oldName to have a valid comparison
-		oldName = Controller.getListOfTrains().get(index).getName();
+		oldName = con.getListOfTrains().get(index).getName();
 		buildWindow();
 	}
 
@@ -78,10 +80,10 @@ public class ConfigView extends JFrame implements ActionListener {
 		setResizable(false);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
-				Controller.closeConfig(index, Controller.getListOfTrains().get(index).getImagePath(),
-						Controller.getListOfTrains().get(index).isBatteryPowered(),
-						Controller.getListOfTrains().get(index).getName(),
-						Controller.getListOfTrains().get(index).getName());
+				con.closeConfig(index, con.getListOfTrains().get(index).getImagePath(),
+						con.getListOfTrains().get(index).isBatteryPowered(),
+						con.getListOfTrains().get(index).getName(),
+						con.getListOfTrains().get(index).getName());
 			}
 		});
 		panelTop.setLayout(new GridLayout(2, 2, 5, 5));
@@ -134,7 +136,7 @@ public class ConfigView extends JFrame implements ActionListener {
 		// if button for image selection is clicked, read out new Imagepath and
 		// repaint
 		if (s == btnSelectImage) {
-			imagePath = Controller.selectImage(this);
+			imagePath = con.selectImage(this);
 			imageLabel.setIcon(prepareImage());
 			panel.add(imageLabel);
 			panel.remove(lblImageMissing);
@@ -147,7 +149,7 @@ public class ConfigView extends JFrame implements ActionListener {
 			if (txtName.getText().equals("")) {
 				JOptionPane.showMessageDialog(this, "Der Name muss mindestens ein Zeichen enthalten.");
 			} else
-				Controller.closeConfig(index, imagePath, cBoxBatteryPowered.isSelected(),txtName.getText(), oldName);
+				con.closeConfig(index, imagePath, cBoxBatteryPowered.isSelected(),txtName.getText(), oldName);
 		}
 
 	}
