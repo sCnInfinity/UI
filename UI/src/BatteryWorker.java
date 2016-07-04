@@ -64,6 +64,7 @@ public class BatteryWorker implements Runnable {
 						con.getListOfTrains().get(index).setBatteryLifeTime(battery);
 						// JProgressBar updaten
 						con.getCPanel().getProgressBars(index).setValue(battery);
+						con.getCPanel().getProgressBars(index).setString(battery + " %");
 
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -98,6 +99,7 @@ public class BatteryWorker implements Runnable {
 						con.getListOfTrains().get(index).setBatteryLifeTime(battery);
 						// Aktualisiert die JProgressBar
 						con.getCPanel().getProgressBars(index).setValue(battery);
+						con.getCPanel().getProgressBars(index).setString(battery + " %");
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

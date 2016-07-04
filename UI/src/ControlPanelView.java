@@ -76,6 +76,8 @@ public class ControlPanelView extends JFrame {
 	/** String array to store the names of all trains created */
 	private String[] trains;
 	private ArrayList<JPanel> trainPanels = new ArrayList<>();
+	private ArrayList<JPanel> fillerPanelsTempo = new ArrayList<>();
+	private ArrayList<JPanel> fillerPanelsBattery = new ArrayList<>();
 	private ArrayList<JToggleButton[]> trainToggleButtons = new ArrayList<>();
 	private ArrayList<JButton[]> trainButtons = new ArrayList<>();
 	private ArrayList<JSlider> trainSliders = new ArrayList<>();
@@ -140,10 +142,21 @@ public class ControlPanelView extends JFrame {
 					new JButton(new ImageIcon(getClass().getResource("battery.png"))),
 					new JButton(new ImageIcon(getClass().getResource("edit.png"))) });
 			trainSliders.add(new JSlider(SwingConstants.VERTICAL, 0, 200, 0));
-			trainLabels.add(new JLabel[] { new JLabel(), new JLabel("Akku") });
-			trainLabels.get(i)[0].setText(trainSliders.get(i).getValue() + "km/h");
-			trainProgressBars.add(new JProgressBar(JProgressBar.VERTICAL, 0, 100));
+			trainSliders.get(i).setMinorTickSpacing(5);
+			trainSliders.get(i).setMajorTickSpacing(100);
+			trainSliders.get(i).setPaintTicks(true);
+			trainSliders.get(i).setPaintLabels(true);
+			trainSliders.get(i).setSnapToTicks(true);
+			trainLabels.add(new JLabel[] { new JLabel(), new JLabel("<html><p align ='center'>Akku</p></html>") });
+			trainLabels.get(i)[0].setText("<html><p align ='center'>" + trainSliders.get(i).getValue() + " <br>km/h</p></html>");
+			trainProgressBars.add(new JProgressBar(JProgressBar.HORIZONTAL, 0, 100));
 			trainProgressBars.get(i).setValue(100);
+			trainProgressBars.get(i).setString(100 + " %");
+			trainProgressBars.get(i).setStringPainted(true);
+			fillerPanelsTempo.add(new JPanel());
+			fillerPanelsTempo.get(i).add(trainLabels.get(i)[0]);
+			fillerPanelsBattery.add(new JPanel());
+			fillerPanelsBattery.get(i).add(trainLabels.get(i)[1]);
 		}
 
 		panel.add(panelTrainLeft);
@@ -157,10 +170,8 @@ public class ControlPanelView extends JFrame {
 			trainPanels.get(i).add(trainButtons.get(i)[0]);
 			trainPanels.get(i).add(trainSliders.get(i));
 			trainPanels.get(i).add(trainProgressBars.get(i));
-//			trainPanels.get(i).add(trainSliders.get(i)[1]);
-//			trainSliders.get(i)[1].setEnabled(false);
-			trainPanels.get(i).add(trainLabels.get(i)[0]);
-			trainPanels.get(i).add(trainLabels.get(i)[1]);
+			trainPanels.get(i).add(fillerPanelsTempo.get(i));
+			trainPanels.get(i).add(fillerPanelsBattery.get(i));
 			trainButtons.get(i)[1].setEnabled(false);
 			trainPanels.get(i).add(trainButtons.get(i)[1]);
 			trainPanels.get(i).add(trainButtons.get(i)[2]);
@@ -234,10 +245,10 @@ public class ControlPanelView extends JFrame {
 		return trainButtons.get(i);
 	}
 
-	public JProgressBar getProgressBars(int i){
+	public JProgressBar getProgressBars(int i) {
 		return trainProgressBars.get(i);
 	}
-	
+
 	public JSlider getSliders(int i) {
 		return trainSliders.get(i);
 	}
