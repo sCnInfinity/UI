@@ -49,7 +49,5 @@ public class LogWriter implements Runnable{
 				e2.printStackTrace();
 			}
 		}
-		
 	}
-
 }

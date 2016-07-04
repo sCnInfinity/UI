@@ -21,7 +21,7 @@ import javax.swing.JTextField;
  * @author Lucas Groﬂ-Hardt
  * @category View
  */
-public class ConfigView extends JFrame implements ActionListener {
+public class ConfigView extends JFrame {
 	private Controller con;
 	/** Button to close the configuration window */
 	private JButton btnCloseConfig = new JButton("Speichern");
@@ -81,8 +81,7 @@ public class ConfigView extends JFrame implements ActionListener {
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent evt) {
 				con.closeConfig(index, con.getListOfTrains().get(index).getImagePath(),
-						con.getListOfTrains().get(index).isBatteryPowered(),
-						con.getListOfTrains().get(index).getName(),
+						con.getListOfTrains().get(index).isBatteryPowered(), con.getListOfTrains().get(index).getName(),
 						con.getListOfTrains().get(index).getName());
 			}
 		});
@@ -91,7 +90,6 @@ public class ConfigView extends JFrame implements ActionListener {
 		panelTop.add(txtName);
 		panelTop.add(new JLabel(" Batteriebetrieben"));
 		panelTop.add(cBoxBatteryPowered);
-		
 
 		// Read image from set Path
 		try {
@@ -110,10 +108,6 @@ public class ConfigView extends JFrame implements ActionListener {
 		panel.add(panelTop, BorderLayout.NORTH);
 		panel.add(panelBot, BorderLayout.SOUTH);
 
-		btnSelectImage.addActionListener(this);
-
-		btnCloseConfig.addActionListener(this);
-
 		setVisible(true);
 	}
 
@@ -125,33 +119,39 @@ public class ConfigView extends JFrame implements ActionListener {
 		return icon;
 	}
 
-	/**
-	 * Method required due to implementing an action listener. Performs actions
-	 * for clicking buttons.
-	 */
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Object s = e.getSource();
-
-		// if button for image selection is clicked, read out new Imagepath and
-		// repaint
-		if (s == btnSelectImage) {
-			imagePath = con.selectImage(this);
-			imageLabel.setIcon(prepareImage());
-			panel.add(imageLabel);
-			panel.remove(lblImageMissing);
-			revalidate();
-			repaint();
-		}
-
-		// Compare old name to new name. Save name if oldName and newName differ
-		if (s == btnCloseConfig) {
-			if (txtName.getText().equals("")) {
-				JOptionPane.showMessageDialog(this, "Der Name muss mindestens ein Zeichen enthalten.");
-			} else
-				con.closeConfig(index, imagePath, cBoxBatteryPowered.isSelected(),txtName.getText(), oldName);
-		}
-
+	public JButton[] getJButtons() {
+		return new JButton[] { btnCloseConfig, btnSelectImage };
 	}
 
+	public JPanel getPanel() {
+		return panel;
+	}
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String path) {
+		imagePath = path;
+	}
+
+	public JCheckBox getCheckBox() {
+		return cBoxBatteryPowered;
+	}
+
+	public JTextField getTextField() {
+		return txtName;
+	}
+
+	public JLabel[] getLabels() {
+		return new JLabel[] { imageLabel, lblImageMissing };
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public String getOldName() {
+		return oldName;
+	}
 }

@@ -1,6 +1,6 @@
 /**
- * Diese Klasse funktioniert wie ein Akkuladegerät. Wird ein Thread dieser
- * Klasse gestartet, wird ein Zug aufgeladen.
+ * Diese Klasse implementiert die Funktionen für das Aufladegerät und die
+ * Entladung eines Zuges. Sie implementiert Runnable und ist somit ausführbar.
  * 
  * @author Lucas Groß-Hardt
  */
@@ -14,10 +14,16 @@ public class BatteryWorker implements Runnable {
 	private int index;
 
 	/**
-	 * Konstruktor. Übernimmt den übergebenen Index.
+	 * Konstruktor. Übernimmt den übergebenen Index, den Controller und nimmt
+	 * die Eigenschaft ladend oder entladend an.
 	 * 
 	 * @param index
 	 *            Nummer des Zuges
+	 * @param con
+	 *            Controller, über den die Daten angesteuert werden.
+	 * @param charge
+	 *            Gibt an, ob der Zug geladen (true) oder entladen (false)
+	 *            werden soll.
 	 * @category Constructor
 	 */
 	public BatteryWorker(int index, Controller con, boolean charge) {
@@ -27,44 +33,48 @@ public class BatteryWorker implements Runnable {
 	}
 
 	/**
-	 * Run-Methode. Erhöht iterativ die Akkulaufzeit und schreibt den
+	 * Run-Methode. Implementiert zwei verschiedene Funktionen.
+	 * 
+	 * 1. Aufladen: Erhöht iterativ die Akkulaufzeit und schreibt den
+	 * Fortschritt in das Log-Fenster.
+	 * 
+	 * 2. Entladen: Verringet iterativ die Akkulaufzeit und schreibt den
 	 * Fortschritt in das Log-Fenster.
 	 */
 	@Override
 	public void run() {
+		// nur Aktion durchführen, wenn der Zug Batteriebetrieben wird
 		if (con.getListOfTrains().get(index).isBatteryPowered()) {
 			if (!charge) {
-				// Stop the Train from charging.
+				// ladevorgang stoppen
 				con.getListOfTrains().get(index).setCharging(false);
-				// Refresh the battery lifetime once every walkthrough
+				// Batterielaufzeit aktualisieren
 				battery = con.getListOfTrains().get(index).getBatteryLifeTime();
-				// Only perform the following actions if charging and battery
-				// lifetime
-				// >= 1
+				// Nur ausführen, wenn Batterielaufzeit > 1, der Zug nicht lädt,
+				// der Zug fährt, und der Zug batteriebetrieben wird
 				while (battery > 1 && !con.getListOfTrains().get(index).isCharging()
-						&& con.getListOfTrains().get(index).isRunning() && con.getListOfTrains().get(index).isBatteryPowered()) {
+						&& con.getListOfTrains().get(index).isRunning()
+						&& con.getListOfTrains().get(index).isBatteryPowered()) {
 					try {
-						// Sleep to give user time to react.
+						// Schlafen, um das Geschehen sichtbar zu machen
 						Thread.sleep(2000);
-						// Decreases Battery Lifetime
+						// Batterielaufzeit verringern
 						battery = battery - 5;
 
 						con.getListOfTrains().get(index).setBatteryLifeTime(battery);
-						// Update Slider if indizes match
+						// JProgressBar updaten
 						con.getCPanel().getProgressBars(index).setValue(battery);
 
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					// Write battery Lifetime to the Temporary Log Display when
-					// reaching
-					// the milestones 50 or 25 %
+					// Bei 25 und 50% Nachricht ins Log schreiben
 					if ((battery == 50 && con.getListOfTrains().get(index).isRunning())
 							|| (battery == 25 && con.getListOfTrains().get(index).isRunning()))
 						con.getLogView().updateLog(
 								con.getListOfTrains().get(index).getName() + ": " + battery + "% Batterieleistung");
 				}
-				// Write Message to the Temporary Log Display if battery is empty
+				// Nachricht ins Log wenn Batterie leer
 				if (battery < 5) {
 					con.getListOfTrains().get(index).setRunning(false);
 					con.getListOfTrains().get(index).setTempo(0);
@@ -86,11 +96,8 @@ public class BatteryWorker implements Runnable {
 						// Akkulaufzeit erhöhen
 						battery = battery + 10;
 						con.getListOfTrains().get(index).setBatteryLifeTime(battery);
-						// Aktualisiert den Slider, wenn der im Control Panel
-						// ausgewählte Zug dem in diesem Thread bearbeiteten Zug
-						// entspricht
+						// Aktualisiert die JProgressBar
 						con.getCPanel().getProgressBars(index).setValue(battery);
-
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

@@ -18,26 +18,26 @@ public class Train extends JPanel implements Runnable {
 	private Controller controller;
 	/** Name of the train */
 	private String name;
+	private String imagePath;
 	/** False = light turned off, true = light turned on */
 	private boolean light;
 	/** to check, whether train is moving forward */
 	private boolean forward;
 	/** to check, whether train is moving backward */
 	private boolean backward;
+	/** to check, whether train is running */
+	private boolean running;
+	/** to check, whether train is charging */
+	private boolean charging;
+	private boolean poweredByBattery;
+	private double rotation = 0;
+	private double rotationChange = 4.5;
 	/** movement speed of the train. Min. 0 ,max. 200 */
 	private int tempo;
 	/** Number to match a train to configuration windows, chargers or counter */
 	private int index;
 	/** Battery capacity of a train. Default is 100 %. */
 	private int battery = 100;
-	/** to check, whether train is running */
-	private boolean running;
-	/** to check, whether train is charging */
-	private boolean charging;
-	private boolean poweredByBattery;
-	private String imagePath;
-	private double rotation = 0;
-	private double rotationChange = 4.5;
 	private int stepSize = 2;
 
 	private int x = 75;
@@ -86,24 +86,6 @@ public class Train extends JPanel implements Runnable {
 			g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
 		g2d.setTransform(old);
 		repaint();
-	}
-
-	/**
-	 * Sets the name for a train and writes changes to the temporary log
-	 * display. Also updates the train selection list.
-	 * 
-	 * @param name
-	 *            Name of the train.
-	 * @param oldName
-	 *            Old name of the train for comparison purposes.
-	 * @category Setter
-	 */
-	public void setName(String name, String oldName) {
-		this.name = name;
-		// Only display name changes if the old name differs from the new one
-		if (!oldName.equals(name)) {
-			controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
-		}
 	}
 
 	public void setBatteryMode(boolean mode) {
@@ -155,6 +137,39 @@ public class Train extends JPanel implements Runnable {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Sets the name for a train and writes changes to the temporary log
+	 * display. Also updates the train selection list.
+	 * 
+	 * @param name
+	 *            Name of the train.
+	 * @param oldName
+	 *            Old name of the train for comparison purposes.
+	 * @category Setter
+	 */
+	public void setName(String name, String oldName) {
+		this.name = name;
+		// Only display name changes if the old name differs from the new one
+		if (!oldName.equals(name)) {
+			controller.getLogView().updateLog("Name geändert: " + oldName + " --> " + name + "( index " + index + ")");
+		}
+	}
+
+	/**
+	 * Returns the direction in which the train is headed.
+	 * 
+	 * @return Direction of the train
+	 * @category Getter
+	 */
+	public String getDirection() {
+		if (forward) {
+			return "forward";
+		} else if (backward) {
+			return "backward";
+		}
+		return null;
 	}
 
 	/**
@@ -221,21 +236,6 @@ public class Train extends JPanel implements Runnable {
 	 */
 	public boolean isRunning() {
 		return running;
-	}
-
-	/**
-	 * Returns the direction in which the train is headed.
-	 * 
-	 * @return Direction of the train
-	 * @category Getter
-	 */
-	public String getDirection() {
-		if (forward) {
-			return "forward";
-		} else if (backward) {
-			return "backward";
-		}
-		return null;
 	}
 
 	/**

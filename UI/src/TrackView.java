@@ -1,11 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,8 +50,6 @@ public class TrackView extends JFrame implements Runnable {
 				colors[i] = Color.RED;
 		}
 
-		TrackDraw tDraw = new TrackDraw();
-
 		JPanel panelLeft = new JPanel();
 		panelLeft.setLayout(null);
 		JPanel panelRight = new JPanel(new GridLayout(5, 3, 5, 5));
@@ -60,6 +60,8 @@ public class TrackView extends JFrame implements Runnable {
 		setMinimumSize(new Dimension(600, 600));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout());
+
+		TrackDraw tDraw = new TrackDraw();
 		panelLeft.add(tDraw);
 
 		JLabel[] labelsName = new JLabel[con.getListOfTrains().size()];
@@ -114,6 +116,15 @@ public class TrackView extends JFrame implements Runnable {
 				labelsName[i].setText(con.getListOfTrains().get(i).getName());
 			}
 		}
+	}
+}
 
+class TrackDraw extends JComponent {
+
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		g.drawRoundRect(44, 40, 369, 373, 120, 120);
+		g.drawRoundRect(66, 65, 323, 323, 100, 100);
+		g.setColor(Color.BLACK);
 	}
 }

@@ -35,7 +35,7 @@ public class LogView extends JFrame {
 	 *            Text which is to be added to the log
 	 * @category Setter
 	 */
-
+	
 	public JTextArea getLogFile() {
 		return txtLog;
 	}

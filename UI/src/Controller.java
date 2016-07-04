@@ -17,26 +17,28 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Controller-Klasse. Startet das Programm. Erzeugt Control Panel, Log-Fenster
- * und Visualisierung. Erzeugt alle nötigen Komponenten.
+ * Controller-Klasse. Verarbeitet Events.
  * 
- * @author Lucas Groß-Hardt
+ * @author Lucas Gross-Hardt
  * @category Controller
  */
 public class Controller implements ActionListener, ChangeListener, MouseListener {
 	/** Log-Fenster */
 	public LogView lView;
-	/** Liste, die alle erzeugten Züge enthält */
+	/** Liste, die alle erzeugten Zuege enthaelt */
 	private ArrayList<Train> listOfTrains = new ArrayList<>();
-	/** Anzahl der Züge, die erstellt werden sollen */
+	/** Anzahl der Zuege, die erstellt werden sollen */
 	private final int numberOfTrains = 4;
 	/** Control panel (Hauptfenster) */
 	private ControlPanelView cPanel;
+	/** Visualisierungsfenster */
+	private TrackView tView;
 	/** Konfigurationsfenster */
 	private ConfigView config;
 	/** Weiche 1 */
@@ -46,55 +48,11 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	/** Weiche 3 */
 	private Switch switch3;
 
-	private TrackView tView;
-
 	/**
-	 * Gibt das Log-Fenster zurück, das im Controller erzeugt wird.
-	 * 
-	 * @return Log-Fenster
-	 * @category Getter
-	 */
-	public LogView getLogView() {
-		return lView;
-	}
-
-	public void setCPanel(ControlPanelView cPanel) {
-		this.cPanel = cPanel;
-		prepareControlPanel();
-	}
-
-	/**
-	 * Gibt das Control Panel zurück, das im Controller erzeugt wird.
-	 * 
-	 * @return Control panel
-	 * @category Getter
-	 */
-	public ControlPanelView getCPanel() {
-		return cPanel;
-	}
-
-	public void setTrackView(TrackView tView) {
-		// TODO Auto-generated method stub
-		this.tView = tView;
-	
-	}
-
-	/**
-	 * Gibt die Liste alle vom Controller erzeugten Züge zurück.
-	 * 
-	 * @return Liste aller Züge
-	 * @category Getter
-	 */
-	public ArrayList<Train> getListOfTrains() {
-		return listOfTrains;
-	}
-
-	/**
-	 * Konstruktor. Erzeugt alle zu erzeugenden Zug-Objekte und fügt sie der
-	 * Liste hinzu. Erstellt dann drei Weichen, das Log-Fenster und das Control
-	 * Panel. Fügt dem Log initiale Einträge hinzu. Startet den LogWriter, der
-	 * das Log in regelmäßigen Abständen speichert. Startet eines neues
-	 * TrackView-Fenster, in dem die Züge visualisiert werden.
+	 * Konstruktor. Erzeugt alle zu erzeugenden Zug-Objekte und fuegt sie der
+	 * Liste hinzu. Erstellt dann drei Weichen. Fuegt dem Log initiale Eintraege
+	 * hinzu. Startet den LogWriter, der das Log in regelmaessigen Abstaenden
+	 * speichert.
 	 * 
 	 * @category Constructor
 	 */
@@ -113,6 +71,15 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		}
 	}
 
+	/**
+	 * Hinterlegt und praepariert das Logfenster, das vom Controller auf dem
+	 * neusten Stand gehalten wird. Startet einen neuen LogWriter fuer das Log,
+	 * der letzters in regelmaessigen Abstaenden speichert.
+	 * 
+	 * @param lView
+	 *            Logfenster
+	 * @category Setter
+	 */
 	public void setLogView(LogView lView) {
 		this.lView = lView;
 		prepareLogView();
@@ -120,184 +87,101 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * Startet einen neuen Counter- oder Charger-Thread. Counter setzt
-	 * Akkuladung iterativ herab. Charger hebt Akkuladung iterativ an.
+	 * Gibt das Log-Fenster zurueck, das im Controller hinterlegt ist.
 	 * 
-	 * @param index
-	 *            Nummer des Zuges, an den der Thread angebunden werden soll.
-	 * @param charge
-	 *            Parameter, der anzeigt, ob ein Zug aufgeladen wird.
-	 */
-	public void startBatteryWorker(int index, boolean charge) {
-		new Thread(new BatteryWorker(index, this, charge)).start();
-	}
-
-	/**
-	 * Bereitet das Log-Fenster vor. Lädt ältere Log-Einträge (wenn vorhanden)
-	 * vom Desktop in das neu gestartete Log-Fenster.
-	 */
-	public void prepareLogView() {
-		String line;
-		try {
-			BufferedReader br = new BufferedReader(
-					new InputStreamReader(new FileInputStream("C:/Users/Lucas/Desktop/Log.txt")));
-			while ((line = br.readLine()) != null) {
-				lView.updateLog(line);
-			}
-		} catch (Exception e) {
-		}
-		lView.getLogFile();
-		lView.updateLog("  \n------ Neue Session -------");
-		lView.updateLog("Neues ControlPanel geöffnet");
-		lView.updateLog("Allen Weiche sind standardmäßig nach links ausgerichtet.");
-	}
-
-	/**
-	 * Fügt alle benötigten Action-, Mouse- und Changelistener hinzu. Erzeugt
-	 * dann das Control Panel und übergibt diesem alle nötigen Elemente. Erzeugt
-	 * dann eine JMenuBar, ein JMenu und mehrere JMenuItems, die allesamt
-	 * unsichtbar hinugefügt werden, um Shortcuts zu realiseren (via
-	 * setAcceleratior). Fügt die JMenuBar dem Control Panel hinzu.
-	 */
-	public void prepareControlPanel() {
-		for (int i = 0; i < listOfTrains.size(); i++) {
-			cPanel.getTrainToggleButtons(i)[0].addActionListener(this);
-			cPanel.getTrainToggleButtons(i)[1].addActionListener(this);
-			cPanel.getTrainToggleButtons(i)[2].addActionListener(this);
-			cPanel.getTrainButtons(i)[0].addActionListener(this);
-			cPanel.getTrainButtons(i)[1].addActionListener(this);
-			cPanel.getTrainButtons(i)[2].addActionListener(this);
-			cPanel.getSliders(i).addMouseListener(this);
-			cPanel.getSliders(i).addChangeListener(this);
-			cPanel.getProgressBars(i).addChangeListener(this);
-		}
-		cPanel.getBtnStopOnEmergency().addActionListener(this);
-
-		for (int i = 0; i < cPanel.getSwitchButtons().length; i++) {
-			cPanel.getSwitchButtons()[i].addActionListener(this);
-		}
-		for (int i = 0; i < cPanel.getMenuItems().length; i++) {
-			cPanel.getMenuItems()[i].addActionListener(this);
-		}
-	}
-
-	/**
-	 * Erstellt ein neues Objekt vom Typ ConfigView. Dieses öffnet ein neues
-	 * Konfigurationsfenster für einen beliebigen Zug. Deaktiviert das Control
-	 * Panel solange das Konfigurationsfenster offen ist.
-	 * 
-	 * @param index
-	 *            Nummer des Zuges
-	 */
-	public void openConfig(int index) {
-		cPanel.setFocusableWindowState(false);
-		cPanel.setEnabled(false);
-		config = new ConfigView(index, this);
-	}
-
-	/**
-	 * Schließt das Konfigurationsfenster und speichert Änderungen. Reaktiviert
-	 * das Control Panel.
-	 * 
-	 * @param index
-	 *            Nummer des Zuges
-	 * @param imagePath
-	 *            Dateipfad des Bildes, das für den Zug eingestellt wurde
-	 * @param trainName
-	 *            Name des Zuges
-	 * @param oldName
-	 *            Alter Zugname für Vergleiche
-	 */
-	public void closeConfig(int index, String imagePath, boolean isBatteryPowered, String trainName, String oldName) {
-		boolean oldBatteryMode = listOfTrains.get(index).isBatteryPowered();
-		cPanel.setFocusableWindowState(true);
-		cPanel.setEnabled(true);
-		config.dispose();
-		if(!oldBatteryMode && isBatteryPowered)startBatteryWorker(index, false);
-		listOfTrains.get(index).setName(trainName, oldName);
-		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
-		System.out.println(""+isBatteryPowered);
-		cPanel.getTrainButtons(index)[1].setEnabled(isBatteryPowered);
-		writeConfigDataToFile(index, imagePath, trainName);
-		tView.getLabelsImg()[index].setIcon(new ImageIcon(
-				new ImageIcon(imagePath).getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
-	}
-
-	/**
-	 * Liest gespeicherte Daten aus einer Textdatei falls vorhanden.
-	 * 
-	 * @param index
-	 *            Nummer des Zuges
-	 * @return String, der alle Informationen zum Zug enthält
+	 * @return Log-Fenster
 	 * @category Getter
 	 */
-	public String readDataFromFile(int index) {
-		String line;
-		String output = "";
-		try {
-			// Neuer BufferedReader, um Datei auszulesen
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt")));
-			// Jede Zeile einzeln den den Output-String anhängen
-			while ((line = br.readLine()) != null) {
-				output += line + ";";
-			}
-		} catch (Exception e) {
-		}
-		return output;
+	public LogView getLogView() {
+		return lView;
 	}
 
 	/**
-	 * Ruft readDataFromFile auf und liest somit Informationen aus einer
-	 * Textdatei aus, falls vorhanden. Teilt den Output-String in wichtige
-	 * Informationen auf un speichert diese in einem Array. Gibt das
-	 * Informationsarray zurück
+	 * Hinterlegt und praepariert das Control Panel, dessen Events vom
+	 * Controller behandelt werden.
 	 * 
-	 * @param index
-	 *            Nummer des Zuges
-	 * @return Array mit Informationen (0 Name, 1 ImagePath)
+	 * @param cPanel
+	 *            Kontrollfenster
+	 * @category Setter
+	 */
+	public void setCPanel(ControlPanelView cPanel) {
+		this.cPanel = cPanel;
+		prepareControlPanel();
+	}
+
+	/**
+	 * Gibt das Control Panel zurueck, das im Controller hinterlegt ist.
+	 * 
+	 * @return Kontrollfenster
 	 * @category Getter
 	 */
-	public String[] readDataOnOpen(int index) {
-		String[] parts = new String[5];
-		try {
-			parts = readDataFromFile(index).split(";");
-		} catch (Exception e) {
-		}
-		return parts;
+	public ControlPanelView getCPanel() {
+		return cPanel;
 	}
 
 	/**
-	 * Öffnet einen FileChooser und gibt anschließend den Dateipfad des
-	 * ausgewählten Bildes zurück.
+	 * Hinterlegt die Visualisierung, die der Controller auf dem neusten Stand
+	 * haelt.
 	 * 
-	 * @param comp
-	 *            Komponente, in der der Dialog angezeigt werden soll.
-	 * @return String Bild-Dateipfad
+	 * @param tView
+	 *            Visualisierungsfenster
+	 * @category Setter
+	 */
+	public void setTrackView(TrackView tView) {
+		this.tView = tView;
+	}
+
+	/**
+	 * Gibt die Liste alle vom Controller erzeugten Zuege zurueck.
+	 * 
+	 * @return Liste aller Zuege
 	 * @category Getter
 	 */
-	public String selectImage(Component comp) {
-		JFileChooser fc = new JFileChooser();
-		fc.setDialogTitle("Bild auswählen..");
-		// Filter hinzufüügen, um nur PNG, JPG und GIF zuzulassen
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
-		fc.setFileFilter(filter);
-		fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG Images", "jpg"));
-		fc.addChoosableFileFilter(new FileNameExtensionFilter("GIF Images", "gif"));
-		int returnVal = fc.showDialog(comp, "Auswählen..");
-		File file = null;
-
-		String imagePath = "";
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			file = fc.getSelectedFile();
-			imagePath = file.getPath();
-		}
-		return imagePath;
+	public ArrayList<Train> getListOfTrains() {
+		return listOfTrains;
 	}
 
 	/**
-	 * Schreibt die Informationen über einen Zug in eine Textdatei. Pro Zug wird
-	 * eine Textdatei erstellt.
+	 * Setzt einen Geschwindigkeitsslider zurueck. Dabei wird der Wert auf 0
+	 * gesetzt, sowie der Tooltip und das darunter befindliche JLabel mit der
+	 * neuen Geschwindigkeit aktualisiert.
+	 * 
+	 * @param i
+	 *            Zugnummer
+	 * @category Setter
+	 */
+	private void resetSlider(int i) {
+		cPanel.getSliders(i).setValue(0);
+		cPanel.getSliders(i).setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i).getValue() + " km/h");
+		cPanel.getLabelTempo(0).setText(cPanel.getSliders(i).getValue() + "km/h");
+	}
+
+	/**
+	 * Aendert den Zustand der beiden JToggleButtons Vorwaerts und Rueckwaerts
+	 * fuer einen Zug. Fuer beide kann angegeben werden, ob sie aktiviert und ob
+	 * sie ausgewaehlt sein sollen.
+	 * 
+	 * @param enBtnForward
+	 *            Gibt an, ob der Vorwaertsbutton aktiviert sein soll
+	 * @param selBtnForward
+	 *            Gibt an, ob der Vorwaertsbutton ausgewaehlt sein soll
+	 * @param enBtnBack
+	 *            Gibt an, ob der Rueckwaertsbutton aktiviert sein soll
+	 * @param selBtnBack
+	 *            Gibt an, ob der Rueckwaertsbutton ausgewaehlt sein soll
+	 * @category Setter
+	 */
+	private void setDirectionButtons(boolean enBtnForward, boolean selBtnForward, boolean enBtnBack, boolean selBtnBack,
+			int i) {
+		cPanel.getTrainToggleButtons(i)[0].setEnabled(enBtnForward);
+		cPanel.getTrainToggleButtons(i)[0].setSelected(selBtnForward);
+		cPanel.getTrainToggleButtons(i)[2].setEnabled(enBtnBack);
+		cPanel.getTrainToggleButtons(i)[2].setSelected(selBtnBack);
+	}
+
+	/**
+	 * Schreibt die Informationen ueber einen Zug in eine Textdatei. Pro Zug
+	 * wird eine Textdatei erstellt.
 	 * 
 	 * @param index
 	 *            Nummer des Zuges
@@ -329,29 +213,200 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * Setzt den Geschwindigkeitsslider zurück. Dabei wird der Wert auf 0
-	 * gesetzt, sowie der Tooltip und das darunter befindliche JLabel mit der
-	 * neuen Geschwindigkeit aktualisiert.
+	 * Startet einen neuen Counter- oder Charger-Thread. Counter setzt
+	 * Akkuladung iterativ herab. Charger hebt Akkuladung iterativ an.
 	 * 
-	 * @category Setter
+	 * @param index
+	 *            Nummer des Zuges, an den der Thread angebunden werden soll.
+	 * @param charge
+	 *            Parameter, der anzeigt, ob ein Zug aufgeladen werden soll.
 	 */
-	private void resetSlider(int i) {
-		cPanel.getSliders(i).setValue(0);
-		cPanel.getSliders(i).setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i).getValue() + " km/h");
-		cPanel.getLabelTempo(0).setText(cPanel.getSliders(i).getValue() + "km/h");
+	public void startBatteryWorker(int index, boolean charge) {
+		new Thread(new BatteryWorker(index, this, charge)).start();
 	}
 
 	/**
-	 * Führt Aktionen für Komponenten aus, denen ein ActionListener hinzugefügt
-	 * wurde. Diese Komponenten beinhalten sowohl JButtons, als auch
-	 * JToggleButtons und JMenuItems.
+	 * Bereitet das Log-Fenster vor. Laedt aeltere Log-Eintraege (wenn
+	 * vorhanden) vom Desktop in das neu gestartete Log-Fenster. Fuegt dem Log
+	 * initiale Eintraege hinzu.
+	 */
+	public void prepareLogView() {
+		String line;
+		try {
+			// Daten per BufferedReader aus TextDatei auslesen
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(new FileInputStream("C:/Users/Lucas/Desktop/Log.txt")));
+			while ((line = br.readLine()) != null) {
+				lView.updateLog(line);
+			}
+		} catch (Exception e) {
+		}
+		lView.getLogFile();
+		lView.updateLog("  \n------ Neue Session -------");
+		lView.updateLog("Neues ControlPanel geoeffnet");
+		lView.updateLog("Allen Weiche sind standardmaessig nach links ausgerichtet.");
+	}
+
+	/**
+	 * Fuegt alle benoetigten Action-, Mouse- und Changelistener, sowie
+	 * Accelerators hinzu.
+	 */
+	public void prepareControlPanel() {
+		for (int i = 0; i < listOfTrains.size(); i++) {
+			cPanel.getTrainToggleButtons(i)[0].addActionListener(this);
+			cPanel.getTrainToggleButtons(i)[1].addActionListener(this);
+			cPanel.getTrainToggleButtons(i)[2].addActionListener(this);
+			cPanel.getTrainButtons(i)[0].addActionListener(this);
+			cPanel.getTrainButtons(i)[1].addActionListener(this);
+			cPanel.getTrainButtons(i)[2].addActionListener(this);
+			cPanel.getSliders(i).addMouseListener(this);
+			cPanel.getSliders(i).addChangeListener(this);
+			cPanel.getProgressBars(i).addChangeListener(this);
+		}
+		cPanel.getBtnStopOnEmergency().addActionListener(this);
+
+		for (int i = 0; i < cPanel.getSwitchButtons().length; i++) {
+			cPanel.getSwitchButtons()[i].addActionListener(this);
+		}
+		for (int i = 0; i < cPanel.getMenuItems().length; i++) {
+			cPanel.getMenuItems()[i].addActionListener(this);
+		}
+	}
+
+	/**
+	 * Erstellt ein neues Objekt vom Typ ConfigView. Dieses oeffnet ein neues
+	 * Konfigurationsfenster fuer einen Zug. Deaktiviert das Control Panel
+	 * solange das Konfigurationsfenster offen ist.
+	 * 
+	 * @param index
+	 *            Nummer des Zuges
+	 */
+	public void openConfig(int index) {
+		cPanel.setFocusableWindowState(false);
+		cPanel.setEnabled(false);
+		config = new ConfigView(index, this);
+		config.getJButtons()[0].addActionListener(this);
+		config.getJButtons()[1].addActionListener(this);
+	}
+
+	/**
+	 * Schliesst das Konfigurationsfenster und speichert Aenderungen.
+	 * Reaktiviert das Control Panel. Aktualisiert Bilder und Namen im
+	 * Visualisierungsfenster.
+	 * 
+	 * @param index
+	 *            Nummer des Zuges
+	 * @param imagePath
+	 *            Dateipfad des Bildes, das fuer den Zug eingestellt wurde
+	 * @param isBatteryPowered
+	 *            Legt fest, ob Zug batteriebetrieben wird
+	 * @param trainName
+	 *            Name des Zuges
+	 * @param oldName
+	 *            Alter Zugname fuer Vergleiche
+	 */
+	public void closeConfig(int index, String imagePath, boolean isBatteryPowered, String trainName, String oldName) {
+		boolean oldBatteryMode = listOfTrains.get(index).isBatteryPowered();
+		cPanel.setFocusableWindowState(true);
+		cPanel.setEnabled(true);
+		config.dispose();
+		// BatteryWorker starten, wenn vorher nicht batteriebetrieben, jetzt
+		// aber schon
+		if (!oldBatteryMode && isBatteryPowered)
+			startBatteryWorker(index, false);
+		listOfTrains.get(index).setName(trainName, oldName);
+		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
+		// Auflade-Button aktivieren oder deaktivieren
+		cPanel.getTrainButtons(index)[1].setEnabled(isBatteryPowered);
+		writeConfigDataToFile(index, imagePath, trainName);
+		tView.getLabelsImg()[index].setIcon(new ImageIcon(
+				new ImageIcon(imagePath).getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
+	}
+
+	/**
+	 * Liest gespeicherte Daten aus einer Textdatei falls vorhanden.
+	 * 
+	 * @param index
+	 *            Nummer des Zuges
+	 * @return String, der alle Informationen zum Zug enthaelt
+	 * @category Getter
+	 */
+	public String readDataFromFile(int index) {
+		String line;
+		String output = "";
+		try {
+			// Neuer BufferedReader, um Datei auszulesen
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					new FileInputStream("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt")));
+			// Jede Zeile einzeln den den Output-String anhaengen
+			while ((line = br.readLine()) != null) {
+				output += line + ";";
+			}
+		} catch (Exception e) {
+		}
+		return output;
+	}
+
+	/**
+	 * Ruft readDataFromFile auf und liest somit Informationen aus einer
+	 * Textdatei aus, falls vorhanden. Teilt den Output-String in wichtige
+	 * Informationen auf und speichert diese in einem Array. Gibt das
+	 * Informationsarray zurueck.
+	 * 
+	 * @param index
+	 *            Nummer des Zuges
+	 * @return Array mit Informationen (0 Name, 1 ImagePath)
+	 * @category Getter
+	 */
+	public String[] readDataOnOpen(int index) {
+		String[] parts = new String[5];
+		try {
+			parts = readDataFromFile(index).split(";");
+		} catch (Exception e) {
+		}
+		return parts;
+	}
+
+	/**
+	 * Oeffnet einen FileChooser und gibt anschliessend den Dateipfad des
+	 * ausgewaehlten Bildes zurueck.
+	 * 
+	 * @param comp
+	 *            Komponente, in der der Dialog angezeigt werden soll.
+	 * @return String Bild-Dateipfad
+	 * @category Getter
+	 */
+	public String selectImage(Component comp) {
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Bild auswaehlen..");
+		// Filter hinzufueuegen, um nur PNG, JPG und GIF zuzulassen
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
+		fc.setFileFilter(filter);
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("JPG Images", "jpg"));
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("GIF Images", "gif"));
+		int returnVal = fc.showDialog(comp, "Auswaehlen..");
+		File file = null;
+
+		String imagePath = "";
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			file = fc.getSelectedFile();
+			imagePath = file.getPath();
+		}
+		return imagePath;
+	}
+
+	/**
+	 * Fuehrt Aktionen fuer Komponenten aus, denen ein ActionListener
+	 * hinzugefuegt wurde.
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// Quelle der Aktion auslesens
 		Object s = e.getSource();
+		// Durchlaufen der ActionEvents fuer alle Zuege (Aktionen
+		// Kontrollfenster)
 		for (int i = 0; i < listOfTrains.size(); i++) {
-			// Konfiguration öffnen
+			// Konfiguration oeffnen
 			if (s == cPanel.getTrainButtons(i)[2])
 				openConfig(i);
 			// Aufladen
@@ -364,7 +419,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				startBatteryWorker(i, true);
 
 			}
-			// Button Vorwärts
+			// Button Vorwaerts
 			else if (s == cPanel.getTrainToggleButtons(i)[0]) {
 				listOfTrains.get(i).setDirection("forward");
 				if (!listOfTrains.get(i).isRunning()) {
@@ -375,7 +430,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				}
 				setDirectionButtons(false, true, true, false, i);
 			}
-			// Button Zurück
+			// Button Zurueck
 			else if (s == cPanel.getTrainToggleButtons(i)[2]) {
 				if (!listOfTrains.get(i).isRunning()) {
 					listOfTrains.get(i).setRunning(true);
@@ -415,6 +470,7 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				setDirectionButtons(true, false, true, false, i);
 			}
 		}
+		// Button Nothalt
 		if (s == cPanel.getBtnStopOnEmergency() || s == cPanel.getMenuItems()[0]) {
 			for (int i = 0; i < getListOfTrains().size(); i++) {
 				listOfTrains.get(i).setRunning(false);
@@ -424,7 +480,9 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 				cPanel.getTrainButtons(i)[1].setSelected(false);
 				listOfTrains.get(i).setLightOn(false);
 			}
-		} else if (s == cPanel.getSwitchButtons()[0] || s == cPanel.getMenuItems()[1]) {
+		}
+		// Weichen-Buttons
+		else if (s == cPanel.getSwitchButtons()[0] || s == cPanel.getMenuItems()[1]) {
 			cPanel.getSwitchButtons()[0].setEnabled(false);
 			cPanel.getSwitchButtons()[1].setEnabled(true);
 			cPanel.getSwitchButtons()[1].setSelected(false);
@@ -461,34 +519,30 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 			cPanel.getSwitchButtons()[5].setSelected(true);
 			switch3.setAlignment(false);
 		}
+
+		// Aktionen Konfigurationsfenster
+		if (s == config.getJButtons()[1]) {
+			config.setImagePath(selectImage(config));
+			config.getLabels()[0].setIcon(config.prepareImage());
+			config.getPanel().add(config.getLabels()[0]);
+			config.getPanel().remove(config.getLabels()[1]);
+			config.revalidate();
+			config.repaint();
+		}
+
+		// Compare old name to new name. Save name if oldName and newName differ
+		if (s == config.getJButtons()[0]) {
+			if (config.getTextField().getText().equals("")) {
+				JOptionPane.showMessageDialog(config, "Der Name muss mindestens ein Zeichen enthalten.");
+			} else
+				closeConfig(config.getIndex(), config.getImagePath(), config.getCheckBox().isSelected(),
+						config.getTextField().getText(), config.getOldName());
+		}
 	}
 
 	/**
-	 * Ändert den Zustand der beiden JToggleButtons btnForward und btnBack. Für
-	 * beide kann angegeben werden, ob sie aktiviert und ob sie ausgewählt sein
-	 * sollen.
-	 * 
-	 * @param enBtnForward
-	 *            Gibt an, ob der btnForward aktiviert sein soll
-	 * @param selBtnForward
-	 *            Gibt an, ob der btnForward ausgewählt sein soll
-	 * @param enBtnBack
-	 *            Gibt an, ob der btnBack aktiviert sein soll
-	 * @param selBtnBack
-	 *            Gibt an, ob der btnBack ausgewählt sein soll
-	 * @category Setter
-	 */
-	private void setDirectionButtons(boolean enBtnForward, boolean selBtnForward, boolean enBtnBack, boolean selBtnBack,
-			int i) {
-		cPanel.getTrainToggleButtons(i)[0].setEnabled(enBtnForward);
-		cPanel.getTrainToggleButtons(i)[0].setSelected(selBtnForward);
-		cPanel.getTrainToggleButtons(i)[2].setEnabled(enBtnBack);
-		cPanel.getTrainToggleButtons(i)[2].setSelected(selBtnBack);
-	}
-
-	/**
-	 * Mouse-Clicked führt Aktion für solche Komponenten aus, zu denen einen
-	 * MouseListener, hinzugefügt wurde. Diese Aktionen werden ausgeführt,
+	 * Mouse clicked fuehrt Aktion fuer solche Komponenten aus, zu denen einen
+	 * MouseListener, hinzugefuegt wurde. Diese Aktionen werden ausgefuehrt,
 	 * sobald ein Klick beendet wurde.
 	 */
 	@Override
@@ -496,8 +550,8 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * Mouse-Clicked führt Aktion für solche Komponenten aus, zu denen einen
-	 * MouseListener, hinzugefügt wurde. Diese Aktionen werden ausgeführt,
+	 * Mouse entered fuehrt Aktion fuer solche Komponenten aus, zu denen einen
+	 * MouseListener, hinzugefuegt wurde. Diese Aktionen werden ausgefuehrt,
 	 * sobald ein Klick beendet wurde.
 	 */
 	@Override
@@ -505,8 +559,8 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * Mouse-Clicked führt Aktion für solche Komponenten aus, zu denen einen
-	 * MouseListener, hinzugefügt wurde. Diese Aktionen werden ausgeführt,
+	 * Mouse exited fuehrt Aktion fuer solche Komponenten aus, zu denen einen
+	 * MouseListener, hinzugefuegt wurde. Diese Aktionen werden ausgefuehrt,
 	 * sobald der Cursor einen Bereich betreten hat.
 	 */
 	@Override
@@ -514,23 +568,23 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * Mouse-Clicked führt Aktion für solche Komponenten aus, zu denen einen
-	 * MouseListener, hinzugefügt wurde. Diese Aktionen werden ausgeführt,
-	 * sobald eine Maustaste heruntergedrückt wird.
+	 * Mouse pressed fuehrt Aktion fuer solche Komponenten aus, zu denen einen
+	 * MouseListener, hinzugefuegt wurde. Diese Aktionen werden ausgefuehrt,
+	 * sobald eine Maustaste heruntergedrueckt wird.
 	 */
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 	}
 
 	/**
-	 * Mouse-Clicked führt Aktion für solche Komponenten aus, zu denen einen
-	 * MouseListener, hinzugefügt wurde. Diese Aktionen werden ausgeführt,
+	 * Mouse released fuehrt Aktion fuer solche Komponenten aus, zu denen einen
+	 * MouseListener, hinzugefuegt wurde. Diese Aktionen werden ausgefuehrt,
 	 * sobald eine Maustaste losgelassen wird.
 	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		Object s = e.getSource();
-
+		// MouseEvents fuer alle Zuege durchlaufen
 		for (int i = 0; i < listOfTrains.size(); i++) {
 			if (s == cPanel.getSliders(i)) {
 				listOfTrains.get(i).setTempo(cPanel.getSliders(i).getValue());
@@ -548,13 +602,14 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	}
 
 	/**
-	 * State Changes wird benötigt, da ein Changelistener hinzugefügt wurde. Die
-	 * Methode führt Aktionen für Objekte aus, denen ein ChangeListener
-	 * hinzugefügt wurde.
+	 * State Changes wird benoetigt, das ein Changelistener hinzugefuegt wurde.
+	 * Die Methode fuehrt Aktionen fuer Objekte aus, denen ein ChangeListener
+	 * hinzugefuegt wurde.
 	 */
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		Object s = e.getSource();
+		// ChangeEvents fuer alle Zuege durchlaufen
 		for (int i = 0; i < listOfTrains.size(); i++) {
 			if (s == cPanel.getSliders(i)) {
 				cPanel.getSliders(i).setToolTipText("Geschwindigkeit: " + cPanel.getSliders(i).getValue() + " km/h");
@@ -568,8 +623,6 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 					setDirectionButtons(true, false, true, false, i);
 				}
 			}
-
 		}
 	}
-
 }
