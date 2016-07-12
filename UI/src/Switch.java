@@ -1,34 +1,44 @@
 /**
- * This Class functions as a Switch to change a trains direction.
- * @author Lucas Groﬂ-Hardt
+ * Diese Klasse implementiert richtungsverstellbare Weichen.
+ * 
+ * @author Lucas Gross-Hardt
+ * @category Model
  */
 public class Switch {
+	/** Controller-Instanz */
 	private Controller con;
-	/**	ID to separate Switch form others. */
+	/** ID, die die Weiche eindeutig identifizierbar macht */
 	private int id;
-	/** Alignment setting. True <> Left, False <> Right*/
+	/** Ausrichtung. True <> Links, False <> Rechts */
 	private boolean alignment;
-	
+
 	/**
-	 * Constructor Method. Sets the alignment and the ID.
-	 * @param id Switch ID.
+	 * Konstruktor. Erstellt eine neue Instanz der Klasse Switch, fuegt eine
+	 * Controller-Instanz hinzu, setzt die Ausrichtung und setzt die ID.
+	 * 
+	 * @param id
+	 *            ID der Weiche
+	 * @param con
+	 *            Controller-Instanz
 	 * @category Constructor
 	 */
 	public Switch(int id, Controller con) {
 		this.con = con;
-		//set default alignment to left
 		alignment = true;
 		this.id = id;
 	}
 
 	/**
-	 * Sets the alignment to either left(true) or right(false). Writes changes to the Temporary Log Display.
+	 * Aendert die Ausrichtung der Weiche und schreibt diese Aenderung in das Log.
+	 * 
 	 * @param alignment
 	 * @category Setter
 	 */
-	public void setAlignment(boolean alignment){
+	public void setAlignment(boolean alignment) {
 		this.alignment = alignment;
-		if(alignment)con.getLogView().updateLog("Weiche "+ id + ": Nach links ausgerichtet.");
-		else con.getLogView().updateLog("Weiche "+ id + ": Nach Rechts ausgerichtet.");
+		if (alignment)
+			con.getLogView().updateLog("Weiche " + id + ": Nach links ausgerichtet.");
+		else
+			con.getLogView().updateLog("Weiche " + id + ": Nach Rechts ausgerichtet.");
 	}
 }

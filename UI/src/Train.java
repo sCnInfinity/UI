@@ -9,54 +9,71 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * This class functions as a train that can be controlled by commands via the
- * ControlPanel.
+ * Dies Klasse implementiert einen Zug, fuer den Einstellungen gespeichert werden
+ * koennen und der auf der Strecke platziert werden kann.
  * 
- * @author Lucas Groﬂ-Hardt
+ * @author Lucas Gross-Hardt
+ * @category Model
+ * @category View
  */
 public class Train extends JPanel implements Runnable {
+	/** Controller-Instanz */
 	private Controller controller;
-	/** Name of the train */
+	/** Name des Zuges */
 	private String name;
+	/** Speicherpfad des Zugbildes */
 	private String imagePath;
-	/** False = light turned off, true = light turned on */
+	/** Licht-Status, false <> aus, true <> an */
 	private boolean light;
-	/** to check, whether train is moving forward */
+	/** Gibt an, ob der Zug vorwaerts faehrt. */
 	private boolean forward;
-	/** to check, whether train is moving backward */
+	/** Gibt an, ob der Zug rueckwaerts faehrt. */
 	private boolean backward;
-	/** to check, whether train is running */
+	/** Gibt an, ob der Zug laeuft. */
 	private boolean running;
-	/** to check, whether train is charging */
+	/** Gibt an, ob der Zug aufgeladen wird. */
 	private boolean charging;
+	/** Gibt an, ob der Zug batteriebetrieben ist */
 	private boolean poweredByBattery;
+	/** Rotationsgrad des Zuges */
 	private double rotation = 0;
+	/** Betrag, um den die Rotation bei einer Drehung geaendert wird. */
 	private double rotationChange = 4.5;
-	/** movement speed of the train. Min. 0 ,max. 200 */
+	/** Bewegungsgeschwindigkeit. Min. 0 ,max. 200 */
 	private int tempo;
-	/** Number to match a train to configuration windows, chargers or counter */
+	/** Zugnummer */
 	private int index;
-	/** Battery capacity of a train. Default is 100 %. */
+	/** Akkukapazitaet. Default-Wert ist 100 %. */
 	private int battery = 100;
+	/**
+	 * Schrittgroesse, um die die Postion des Zuges bei der Bewegung verschoben
+	 * wird.
+	 */
 	private int stepSize = 2;
 
+	/** X-Position des Zuges */
 	private int x = 75;
+	/** Y-Position des Zuges */
 	private int y = 23;
+	/** Breite des Zuges */
 	private int w = 60;
+	/** Hoehe des Zuges */
 	private int h = 60;
-
+	/** X-Koordinate der Zugmitte */
 	private int cX = 0;
+	/** Y-Koordinate der Zugmitte */
 	private int cY = 0;
 
 	/**
-	 * Constructor method. Sets name, index and direction. Default direction:
-	 * forward
+	 * Konstruktor. Erzeugt eine neue Instanz der Klasse Train und setzt den
+	 * Zugnamen, die Zugnummer und die Controller-Instanz des Zuges.
 	 * 
 	 * @param name
-	 *            Name of the train.
+	 *            Zugname.
 	 * @param index
-	 *            Number to match a train to configuration windows, chargers or
-	 *            counter
+	 *            Zugnummer
+	 * @param con
+	 *            Controller-Instanz
 	 * @category Constructor
 	 */
 	public Train(String name, int index, Controller con) {
@@ -73,12 +90,15 @@ public class Train extends JPanel implements Runnable {
 		this.index = index;
 	}
 
+	/**
+	 * Paint-Component Methode. Zeichnet den Zug in das Visualisierungsfenster.
+	 */
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		super.paintComponent(g);
 		AffineTransform old = g2d.getTransform();
 		g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
-		g2d.setColor(TrackView.getColors(index));
+		g2d.setColor(controller.getTrackView().getColors().get(index));
 		g2d.fillRect(12, 26, 30, 8);
 		if (light)
 			g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
@@ -88,6 +108,13 @@ public class Train extends JPanel implements Runnable {
 		repaint();
 	}
 
+	/**
+	 * Aendert den Batteriemodus des Zuges.
+	 * 
+	 * @param mode
+	 *            Batteriemodus
+	 * @category Setter
+	 */
 	public void setBatteryMode(boolean mode) {
 		poweredByBattery = mode;
 		if (poweredByBattery)
@@ -96,22 +123,41 @@ public class Train extends JPanel implements Runnable {
 			controller.getLogView().updateLog(name + " ist nun ans Stromnetz angeschlossen.");
 	}
 
+	/**
+	 * Gibt zurueck, ob der Zug batteriebetrieben ist.
+	 * 
+	 * @return Batteriemodus
+	 * @category Getter
+	 */
 	public boolean isBatteryPowered() {
 		return poweredByBattery;
 	}
 
+	/**
+	 * Gibt den Speicherpfad des Bildes zurueck.
+	 * 
+	 * @return Speicherpfad des Bildes.
+	 * @category Getter
+	 */
 	public String getImagePath() {
 		return imagePath;
 	}
 
+	/**
+	 * Setzt den Speicherpfad des Bildes.
+	 * 
+	 * @param path
+	 *            Speicherpfad des Bildes.
+	 * @category Setter
+	 */
 	public void setImagePath(String path) {
 		imagePath = path;
 	}
 
 	/**
-	 * Returns the lifetime remaining for a trains battery
+	 * Gibt die Akkulaufzeit des Zuges zurueck.
 	 * 
-	 * @return Battery lifetime
+	 * @return Akkulaufzeit
 	 * @category Getter
 	 */
 	public int getBatteryLifeTime() {
@@ -119,10 +165,10 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Sets the battery lifetime for a train
+	 * Setzt die Akkulaufzeit des Zuges.
 	 * 
 	 * @param battery
-	 *            Battery lifetime for a train
+	 *            Akkulaufzeit
 	 * @category Setter
 	 */
 	public void setBatteryLifeTime(int battery) {
@@ -130,9 +176,9 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Returns the name of a train.
+	 * Gibt den Namen des Zuges zurueck.
 	 * 
-	 * @return Name of the train
+	 * @return Name des Zuges
 	 * @category Getter
 	 */
 	public String getName() {
@@ -140,27 +186,27 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Sets the name for a train and writes changes to the temporary log
-	 * display. Also updates the train selection list.
+	 * Setzt den Namen und schreibt die Aenderungen ggf. in das Log
 	 * 
 	 * @param name
-	 *            Name of the train.
+	 *            Name des Zuges
 	 * @param oldName
-	 *            Old name of the train for comparison purposes.
+	 *            Vorheriger Name des Zuges
 	 * @category Setter
 	 */
 	public void setName(String name, String oldName) {
 		this.name = name;
-		// Only display name changes if the old name differs from the new one
+		// Aenderungen nur anzeigen, wenn der neue Namen sich vom Alten
+		// unterscheidet
 		if (!oldName.equals(name)) {
-			controller.getLogView().updateLog("Name ge‰ndert: " + oldName + " --> " + name + "( index " + index + ")");
+			controller.getLogView().updateLog("Name geaendert: " + oldName + " --> " + name + "( index " + index + ")");
 		}
 	}
 
 	/**
-	 * Returns the direction in which the train is headed.
+	 * Gibt die Richtung zurueck, in die der Zug faehrt.
 	 * 
-	 * @return Direction of the train
+	 * @return Bewegungsrichtung
 	 * @category Getter
 	 */
 	public String getDirection() {
@@ -173,30 +219,29 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Sets the direction of a train. Also writes changes to the temporary log
-	 * display.
+	 * Setzt die Bewegungsrichtung des Zuges und schreibt Aenderungen in das Log.
 	 * 
 	 * @param direction
-	 *            Direction in which a train is headed.
+	 *            Bewegungsrichtung
 	 * @category Setter
 	 */
 	public void setDirection(String direction) {
 		if (direction.equals("forward")) {
 			forward = true;
 			backward = false;
-			controller.getLogView().updateLog(name + " f‰hrt nun vorw‰rts ");
+			controller.getLogView().updateLog(name + " faehrt nun vorwaerts ");
 		} else if (direction.equals("backward")) {
 			backward = true;
 			forward = false;
-			controller.getLogView().updateLog(name + " f‰hrt nun r¸ckw‰rts ");
+			controller.getLogView().updateLog(name + " faehrt nun rueckwaerts ");
 		}
 	}
 
 	/**
-	 * Sets a train to charging or not charging.
+	 * Versetzt den Zug in den Status aufladen oder nicht aufladen.
 	 * 
 	 * @param charging
-	 *            To check if a train is charging.
+	 *            Gibt an, on der Zug auflaedt.
 	 * @category Setter
 	 */
 	public void setCharging(boolean charging) {
@@ -204,9 +249,9 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Returns whether a train is charging or not.
+	 * Gibt zurueck, ob der Zug auflaedt oder nicht.
 	 * 
-	 * @return Charging state
+	 * @return Gibt an, ob der Zug auflaedt
 	 * @category Getter
 	 */
 	public boolean isCharging() {
@@ -214,11 +259,11 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Sets the state of the train to running or not running. Also write updates
-	 * to the temporary log display.
+	 * Aktiviert oder deaktiviert den Zug. Schreibt ggf. Informationen in das
+	 * Log.
 	 * 
 	 * @param running
-	 *            To check if the train is running or not
+	 *            Gibt an, ob der Zug laeuft.
 	 * @category Setter
 	 */
 	public void setRunning(boolean running) {
@@ -229,9 +274,9 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Return the state of the train. Either running (true) or not (false)
+	 * Gibt zurueck, ob der Zug laeuft
 	 * 
-	 * @return Running state
+	 * @return Gibt an, ob der Zug laeuft.
 	 * @category Getter
 	 */
 	public boolean isRunning() {
@@ -239,14 +284,13 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Turns the light on or off. True for on, false for off.
+	 * Stellt das Licht an oder aus.
 	 * 
 	 * @param status
-	 *            Status to set for a trains light
+	 *            Lichtstatus
 	 * @category Setter
 	 */
 	public void setLightOn(boolean status) {
-		// temporary variable to check for status changes.
 		boolean tmp = light;
 		if (status) {
 			if (battery > 0) {
@@ -257,7 +301,6 @@ public class Train extends JPanel implements Runnable {
 				light = false;
 			}
 		} else {
-			// only display log info if the state is changed
 			if (!(tmp == status)) {
 				controller.getLogView().updateLog(name + ": Licht aus");
 				light = status;
@@ -266,9 +309,9 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Returns whether the light is turned on or off. True = On, false = Off
+	 * Gibt zurueck, ob das Licht eingeschaltet ist.
 	 * 
-	 * @return Light status
+	 * @return Lichtstatus
 	 * @category Getter
 	 */
 	public boolean lightIsOn() {
@@ -276,34 +319,42 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Sets the movement speed for a train. Also writes updates to the temporary
-	 * log file.
+	 * Stellt die Bewegungsgeschwindigkeit des Zuges ein.
 	 * 
 	 * @param tempo
-	 *            Movement speed of a train
+	 *            Bewegungsgeschwindigkeit
 	 * @category Setter
 	 */
 	public void setTempo(int tempo) {
 		this.tempo = tempo;
 		if (battery > 1) {
-			controller.getLogView().updateLog(name + " f‰hrt jetzt mit einer Geschwindigkeit von " + tempo + " km/h.");
+			controller.getLogView().updateLog(name + " faehrt jetzt mit einer Geschwindigkeit von " + tempo + " km/h.");
 		}
 	}
 
 	/**
-	 * Returns the movement speed of a train.
+	 * Gibt die Bewegungsgeschwindigkeit des Zuges zurueck.
 	 * 
-	 * @return Movement speed of a train
+	 * @return Bewegungsgeschwindigkeit
 	 * @category Getter
 	 */
 	public int getTempo() {
 		return tempo;
 	}
 
+	/**
+	 * Gibt die Positionsparamter des Zuges in einem Array zurueck.
+	 * 
+	 * @return Array mit Positionsparametern
+	 * @category Getter
+	 */
 	public int[] getPositionParameters() {
 		return new int[] { x, y, w, h };
 	}
 
+	/**
+	 * Bewegt den Zug in die korrekte Richtung.
+	 */
 	public void moveTrain() {
 		if (running && tempo > 0) {
 			if (getDirection().equals("backward")) {
@@ -317,7 +368,6 @@ public class Train extends JPanel implements Runnable {
 					moveLeft();
 				else if (cX < 95 && cY <= 400)
 					moveDown();
-
 			}
 			if (getDirection().equals("forward")) {
 				cX = x + w / 2;
@@ -340,6 +390,9 @@ public class Train extends JPanel implements Runnable {
 
 	}
 
+	/**
+	 * Bewegt den Zug nach rechts.
+	 */
 	public void moveRight() {
 		x = cX - w / 2;
 		y = cY - h / 2;
@@ -369,6 +422,9 @@ public class Train extends JPanel implements Runnable {
 
 	}
 
+	/**
+	 * Bewegt den Zug nach unten.
+	 */
 	public void moveDown() {
 		x = cX - w / 2;
 		y = cY - h / 2;
@@ -395,6 +451,9 @@ public class Train extends JPanel implements Runnable {
 		}
 	}
 
+	/**
+	 * Bewegt den Zug nach links.
+	 */
 	public void moveLeft() {
 		x = cX - w / 2;
 		y = cY - h / 2;
@@ -420,6 +479,9 @@ public class Train extends JPanel implements Runnable {
 		repaint();
 	}
 
+	/**
+	 * Bewegt den Zug nach Oben.
+	 */
 	public void moveUp() {
 		x = cX - w / 2;
 		y = cY - h / 2;
@@ -445,6 +507,10 @@ public class Train extends JPanel implements Runnable {
 		repaint();
 	}
 
+	/**
+	 * Run-Methode. Wird aufgerufen, sobald eine Runnable-Instant der Klasse Zug
+	 * angestossen wird. Bewegt den Zug.
+	 */
 	@Override
 	public void run() {
 		while (true) {

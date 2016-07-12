@@ -16,44 +16,49 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * This class functions as a viewable configuration window.
+ * Diese Klasse implementiert die Anzeige fuer ein Konfigurationsfenster.
  * 
- * @author Lucas Groﬂ-Hardt
+ * @author Lucas Gross-Hardt
  * @category View
  */
 public class ConfigView extends JFrame {
+	/** Instanz der Controller-Klasse */
 	private Controller con;
-	/** Button to close the configuration window */
+	/** Button Konfiguration Schliessen */
 	private JButton btnCloseConfig = new JButton("Speichern");
-	/** Button to select an image for a train */
-	private JButton btnSelectImage = new JButton("<html>Bild w‰hlen</html>");
-	/** Contentpane */
+	/** Button Bild auswaehlen */
+	private JButton btnSelectImage = new JButton("<html>Bild waehlen</html>");
+	/** Hauptpanel */
 	private JPanel panel = new JPanel(new BorderLayout());
+	/** Unteres Panel */
 	private JPanel panelBot = new JPanel();
+	/** Oberes Panel */
 	private JPanel panelTop = new JPanel();
-	/** Textfield to change a trains name */
+	/** Textfeld Name */
 	private JTextField txtName = new JTextField();
-	/** Label to display a trains image */
+	/** Label Bildanzeige */
 	private JLabel imageLabel;
-	/** */
+	/** Label Bild fehlt */
 	private JLabel lblImageMissing = new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("noimg.png"))
 			.getImage().getScaledInstance(90, 90, java.awt.Image.SCALE_SMOOTH)));
+	/** Checkbox batteriebetrieben */
 	private JCheckBox cBoxBatteryPowered = new JCheckBox();
-	/** Number to match a configuration window to a train */
+	/** Zugnummer */
 	private int index;
-	/** Path to the location of a trains image */
+	/** Bildpfad */
 	private String imagePath;
-	/** String array to store train data */
+	/** Datenarray Zugdaten */
 	private String[] data;
-	/** String for comparison purposes when the name of a train is changed */
+	/** Vorheriger Name */
 	private String oldName;
 
 	/**
-	 * Constructor method. Sets the index and reads previously saved data from
-	 * files if existing.
+	 * Konstruktor. Setzt index und laedt Daten aus Textdatei.
 	 * 
 	 * @param index
-	 *            Number to match the configuration window
+	 *            Zugnummer
+	 * @param con
+	 *            Controller-Instanz
 	 * @category Constructor
 	 */
 	public ConfigView(int index, Controller con) {
@@ -65,15 +70,16 @@ public class ConfigView extends JFrame {
 			imagePath = data[1];
 		} catch (Exception e) {
 		}
-		// set a value for oldName to have a valid comparison
+		// Wert setzen, um Vergleichswert zu haben
 		oldName = con.getListOfTrains().get(index).getName();
 		buildWindow();
 	}
 
 	/**
-	 * Method to build the configuration window
+	 * Baut das Konfigurationsfenster auf.
 	 */
 	private void buildWindow() {
+		// Fenstereigenschaften festlegen
 		setTitle("Eisenbahn: Konfiguration");
 		setContentPane(panel);
 		setSize(400, 300);
@@ -85,22 +91,20 @@ public class ConfigView extends JFrame {
 						con.getListOfTrains().get(index).getName());
 			}
 		});
+		// Elemente zum Fenster hinzufuegen
 		panelTop.setLayout(new GridLayout(2, 2, 5, 5));
 		panelTop.add(new JLabel(" Name eingeben"));
 		panelTop.add(txtName);
 		panelTop.add(new JLabel(" Batteriebetrieben"));
 		panelTop.add(cBoxBatteryPowered);
 
-		// Read image from set Path
+		// Bild von gesetztem Pfad lesen
 		try {
 			imageLabel = new JLabel(prepareImage());
-			// adjust label size to image size
 			panel.add(imageLabel);
-			if (imageLabel.getIcon().getIconWidth() < 0)
+			if (imageLabel.getIcon().getIconWidth() < 1)
 				panel.add(lblImageMissing);
-
 		} catch (Exception e) {
-
 		}
 		panelBot.setLayout(new GridLayout(1, 2));
 		panelBot.add(btnSelectImage);
@@ -111,6 +115,11 @@ public class ConfigView extends JFrame {
 		setVisible(true);
 	}
 
+	/**
+	 * Liest das Bild vom Pfad und gibt ein Icon mit diesem Bild zurueck.
+	 * 
+	 * @return ImageIcon fuer Bildanzeige
+	 */
 	public ImageIcon prepareImage() {
 		ImageIcon icon = new ImageIcon(imagePath);
 		Image img = icon.getImage();
@@ -119,38 +128,92 @@ public class ConfigView extends JFrame {
 		return icon;
 	}
 
+	/**
+	 * Gibt die beiden JButtons des Fensters in einem Array zurueck.
+	 * 
+	 * @return ButtonArray
+	 * @category Getter
+	 */
 	public JButton[] getJButtons() {
 		return new JButton[] { btnCloseConfig, btnSelectImage };
 	}
 
+	/**
+	 * Gibt das Hauptpanel des Fensters zurueck.
+	 * 
+	 * @return Hauptpanel
+	 * @category Getter
+	 */
 	public JPanel getPanel() {
 		return panel;
 	}
 
+	/**
+	 * Gibt den Speicherpfad des Bildes zurueck.
+	 * 
+	 * @return Speicherpfad
+	 * @category Getter
+	 */
 	public String getImagePath() {
 		return imagePath;
 	}
 
+	/**
+	 * Ueberschreibt den Imagepfad des Bildes.
+	 * 
+	 * @param Speicherpfad
+	 * @category Setter
+	 */
 	public void setImagePath(String path) {
 		imagePath = path;
 	}
 
+	/**
+	 * Gibt die Checkbox des Fensters zurueck.
+	 * 
+	 * @return Checkbox Batterienutzung
+	 * @category Getter
+	 */
 	public JCheckBox getCheckBox() {
 		return cBoxBatteryPowered;
 	}
 
+	/**
+	 * Gibt das Textfeld des Fensters zurueck.
+	 * 
+	 * @return Textfeld
+	 * @category Getter
+	 */
 	public JTextField getTextField() {
 		return txtName;
 	}
 
+	/**
+	 * Gibt die Labels des Fensters zurueck.
+	 * 
+	 * @return Array von Labels
+	 * @category Getter
+	 */
 	public JLabel[] getLabels() {
 		return new JLabel[] { imageLabel, lblImageMissing };
 	}
 
+	/**
+	 * Gibt die Zugnummer zurueck.
+	 * 
+	 * @return Zugnummer
+	 * @category Getter
+	 */
 	public int getIndex() {
 		return index;
 	}
 
+	/**
+	 * Gibt den vorherigen Namen zurueck.
+	 * 
+	 * @category Getter
+	 * @return vorheriger Name
+	 */
 	public String getOldName() {
 		return oldName;
 	}

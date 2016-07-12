@@ -1,3 +1,4 @@
+
 import java.awt.BorderLayout;
 
 import javax.swing.ImageIcon;
@@ -7,12 +8,28 @@ import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 import javax.swing.UIManager;
 
+/**
+ * Hauptklasse, die das Programm startet und die Hauptfenster erzeugt.
+ * 
+ * @author Lucas
+ * @category Main
+ */
 public class Start {
+	/** Visualisierung der Zuege */
 	private TrackView tView;
+	/** Kontrollfenster der Zuege */
 	private ControlPanelView cPanel;
+	/** Log-Anzeige */
 	private LogView lView;
-	private static final int numberOfTrains = 4;
+	/** Anzahl der Zuege, die erzeugt werden soll. */
+	private static final int numberOfTrains = 1;
 
+	/**
+	 * Konstruktor. Passt das Look-And-Feel an, startet den Ladebildschirm und
+	 * baut das User Interface auf.
+	 * 
+	 * @category Constructor
+	 */
 	public Start() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -28,12 +45,23 @@ public class Start {
 		buildUI();
 	}
 
+	/**
+	 * Main-Methode. Startet bei Ausfuehrung das Programm, indem eine neue
+	 * Instanz der Klasse Start erzeugt wird.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Start start = new Start();
 	}
 
+	/**
+	 * Baut das UI auf. Diese Methode ist mit der Methode showLoadingScreen
+	 * synchronisiert, um den Aufbau zeutlich abhaengig vom Ladebildschirm zu
+	 * gestalten.
+	 */
 	private synchronized void buildUI() {
-		Controller con = new Controller();
+		Controller con = new Controller(numberOfTrains);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				tView = new TrackView(con);
@@ -45,6 +73,7 @@ public class Start {
 				con.setLogView(lView);
 			}
 		});
+		// Auf die Beendigung des Ladebildschirms warten.
 		try {
 			this.wait();
 		} catch (InterruptedException e) {
@@ -55,6 +84,11 @@ public class Start {
 		tView.setVisible(true);
 	}
 
+	/**
+	 * Zeigt den Ladebildschirm an. Diese Methode ist mit der Methode buildUI
+	 * synchronisiert, um den um den Aufbau des UIs zeutlich abhaengig vom Ladebildschirm
+	 * zu gestalten.
+	 */
 	private synchronized void showLoadingScreen() {
 		JWindow loadingScreen = new JWindow();
 		JPanel content = new JPanel(new BorderLayout());
@@ -81,6 +115,7 @@ public class Start {
 			}
 		}
 		loadingScreen.dispose();
+		//notify, um showLoadingsScreen() zu wecken
 		this.notifyAll();
 	}
 }

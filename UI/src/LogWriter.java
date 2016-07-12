@@ -6,23 +6,34 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Diese Klasse funktioniert wie ein Dienst, der im Hintergrund läuft und den Inhalt des Log-Fensters regelmäßig in eine Textdatei speichert.
+ * Diese Klasse ist ausfuehrbar und speichert im Hintergrund den Inhalt des
+ * Log-Fensters regelmaessig in eine Textdatei.
+ * 
  * @author Lucas
- *
+ * @category Worker
  */
-public class LogWriter implements Runnable{
+public class LogWriter implements Runnable {
+	/** Controller-Instanz */
 	private Controller con;
+
 	/**
-	 * Run-Methode. Wird ausgeführt, wenn ein Thread
-	*/
-	
-	public LogWriter(Controller con){
+	 * Konstruktor. Setzt einen Wert fuer die Controller-Instanz.
+	 * 
+	 * @param con
+	 *            Controller-Instanz
+	 * @category Constructor
+	 */
+	public LogWriter(Controller con) {
 		this.con = con;
 	}
-	
+
+	/**
+	 * Run-Methode. Wird ausgefuehrt, wenn ein Thread dieser Klasse ausgefuehrt
+	 * wird.
+	 */
 	@Override
 	public void run() {
-		while(true){
+		while (true) {
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e3) {
@@ -40,9 +51,11 @@ public class LogWriter implements Runnable{
 			}
 			try {
 				PrintWriter writer = new PrintWriter("C:/Users/Lucas/Desktop/Log.txt");
-				for(int i = 0; i < parts.length; i ++){
-					if(i == 0)writer.print(parts[i]);
-					else writer.println(parts[i]);
+				for (int i = 0; i < parts.length; i++) {
+					if (i == 0)
+						writer.print(parts[i]);
+					else
+						writer.println(parts[i]);
 				}
 				writer.close();
 			} catch (IOException e2) {
