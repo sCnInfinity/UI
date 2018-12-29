@@ -24,6 +24,8 @@ import javax.swing.JPanel;
 public class TrackView extends JFrame implements Runnable {
 	/** Controller-Instanz */
 	private Controller con;
+
+	private Backgroundworker bw;
 	/** ArrayList mit allen Farben fuer Zuege */
 	private ArrayList<Color> colors = new ArrayList<>();
 	/** ArrayList mit allen BilderLabeln fuer Zuege */
@@ -167,10 +169,13 @@ public class TrackView extends JFrame implements Runnable {
 		labelsColor.get(0).setOpaque(true);
 		panelsTrains.get(0).add(labelsColor.get(0));
 
-		for (int j = 0; j < con.getListOfTrains().size(); j++) {
-			panelLeft.add(con.getListOfTrains().get(j));
-			new Thread(con.getListOfTrains().get(j)).start();
+		// Backgroundworker starten
+		bw = new Backgroundworker(con);
+		new Thread(bw).start();
+		for (int i = 0; i < con.getListOfTrains().size(); i++) {
+			panelLeft.add(con.getListOfTrains().get(i));
 		}
+
 		getContentPane().add(panelLeft);
 		panelRight.setLayout(new GridLayout(con.getListOfTrains().size(), 1));
 		panelRight.add(panelsTrains.get(0));

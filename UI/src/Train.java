@@ -9,14 +9,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * Dies Klasse implementiert einen Zug, fuer den Einstellungen gespeichert werden
- * koennen und der auf der Strecke platziert werden kann.
+ * Dies Klasse implementiert einen Zug, fuer den Einstellungen gespeichert
+ * werden koennen und der auf der Strecke platziert werden kann.
  * 
  * @author Lucas Gross-Hardt
  * @category Model
  * @category View
  */
-public class Train extends JPanel implements Runnable {
+public class Train extends JPanel {
 	/** Controller-Instanz */
 	private Controller controller;
 	/** Name des Zuges */
@@ -90,23 +90,22 @@ public class Train extends JPanel implements Runnable {
 		this.index = index;
 	}
 
-	/**
-	 * Paint-Component Methode. Zeichnet den Zug in das Visualisierungsfenster.
-	 */
 	public void paintComponent(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		super.paintComponent(g);
-		AffineTransform old = g2d.getTransform();
-		g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
-		g2d.setColor(controller.getTrackView().getColors().get(index));
-		g2d.fillRect(12, 26, 30, 8);
-		if (light)
-			g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
-		else
-			g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
-		g2d.setTransform(old);
-		repaint();
-		g2d.dispose();
+		for (int i = 0; i < controller.getListOfTrains().size(); i++) {
+			Graphics2D g2d = (Graphics2D) g;
+			super.paintComponent(g);
+			AffineTransform old = g2d.getTransform();
+			g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
+			g2d.setColor(controller.getTrackView().getColors().get(index));
+			g2d.fillRect(12, 26, 30, 8);
+			if (controller.getListOfTrains().get(i).lightIsOn()) {
+				g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
+			} else
+				g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
+			g2d.setTransform(old);
+			repaint();
+			g2d.dispose();
+		}
 	}
 
 	/**
@@ -174,6 +173,52 @@ public class Train extends JPanel implements Runnable {
 	 */
 	public void setBatteryLifeTime(int battery) {
 		this.battery = battery;
+	}
+
+	public void calculateBatteryLife() {
+		if (poweredByBattery) {
+			if (!charging) {
+				// Batterielaufzeit aktualisieren
+				// Nur ausfuehren, wenn Batterielaufzeit > 1, der Zug nicht laedt,
+				// der Zug faehrt, und der Zug batteriebetrieben wird
+				if (battery >= 1 && running && poweredByBattery) {
+					// Batterielaufzeit verringern
+					battery = battery - 1;
+					// JProgressBar updaten
+					controller.getCPanel().getProgressBars().get(index).setValue(battery);
+					controller.getCPanel().getProgressBars().get(index).setString(battery + " %");
+
+					// Bei 25 und 50% Nachricht ins Log schreiben
+					if ((battery == 50 && running) || (battery == 25 && running))
+						controller.getLogView().updateLog(name + ": " + battery + "% Batterieleistung");
+				}
+				// Nachricht ins Log wenn Batterie leer
+				if (battery < 1) {
+					running = false;
+					tempo = 0;
+					controller.getLogView().updateLog(name + ": Batterie leer.");
+				}
+
+			} else {
+				// Akkulaufzeit bei jedem Durchlauf aktualisieren
+				// solange Akku nicht voll geladen, der Zug auflaedt und der Zug
+				// nicht
+				// laeuft
+				if (battery <= 99 && charging && !running) {
+					// Sleep-Aufruf, um das Programm fuer den Nutzer bedienbar zu
+					// machen.
+					// Akkulaufzeit erhoehen
+					battery = battery + 1;
+					// Aktualisiert die JProgressBar
+					controller.getCPanel().getProgressBars().get(index).setValue(battery);
+					controller.getCPanel().getProgressBars().get(index).setString(battery + " %");
+				}
+				// Nachricht im Log: Batterie aufgeladen, wenn Akku voll geladen
+				controller.getLogView().updateLog(name + ": Batterie aufgeladen.");
+				// Ladevorgang beenden
+			}
+		}
+		// nur Aktion durchfuehren, wenn der Zug Batteriebetrieben wird
 	}
 
 	/**
@@ -260,8 +305,7 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
-	 * Aktiviert oder deaktiviert den Zug. Schreibt ggf. Informationen in das
-	 * Log.
+	 * Aktiviert oder deaktiviert den Zug. Schreibt ggf. Informationen in das Log.
 	 * 
 	 * @param running
 	 *            Gibt an, ob der Zug laeuft.
@@ -354,9 +398,20 @@ public class Train extends JPanel implements Runnable {
 	}
 
 	/**
+	 * Gibt die Positionsparamter des Zuges in einem Array zurueck.
+	 * 
+	 * @return Array mit Positionsparametern
+	 * @category Getter
+	 */
+	public double getRotation() {
+		return rotation;
+	}
+
+	/**
 	 * Bewegt den Zug in die korrekte Richtung.
 	 */
 	public void moveTrain() {
+		stepSize = 2 + (tempo / 25);
 		if (running && tempo > 0) {
 			if (getDirection().equals("backward")) {
 				cX = x + w / 2;
@@ -384,13 +439,7 @@ public class Train extends JPanel implements Runnable {
 					moveUp();
 				System.out.println("move");
 			}
-			try {
-				Thread.sleep(500 / tempo);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
-
 
 	}
 
@@ -454,7 +503,7 @@ public class Train extends JPanel implements Runnable {
 			cY = y + h / 2;
 			repaint();
 		}
-		
+
 		System.out.println("Down");
 	}
 
@@ -516,15 +565,4 @@ public class Train extends JPanel implements Runnable {
 		System.out.println("Up");
 	}
 
-	/**
-	 * Run-Methode. Wird aufgerufen, sobald eine Runnable-Instant der Klasse Zug
-	 * angestossen wird. Bewegt den Zug.
-	 */
-	@Override
-	public void run() {
-		while (true) {
-			moveTrain();
-		}
-
-	}
 }

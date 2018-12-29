@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
@@ -148,7 +149,8 @@ public class ControlPanelView extends JFrame {
 							new JToggleButton(new ImageIcon(getClass().getResource("down.png"))) });
 			trainButtons.add(new JButton[] { new JButton(new ImageIcon(getClass().getResource("stop.png"))),
 					new JButton(new ImageIcon(getClass().getResource("battery.png"))),
-					new JButton(new ImageIcon(getClass().getResource("edit.png"))) });
+					new JButton(new ImageIcon(getClass().getResource("edit.png"))),
+					new JButton(new ImageIcon(getClass().getResource("trash.png")))});
 			trainSliders.add(new JSlider(SwingConstants.VERTICAL, 0, 200, 0));
 			trainSliders.get(i).setMinorTickSpacing(5);
 			trainSliders.get(i).setMajorTickSpacing(100);
@@ -167,6 +169,7 @@ public class ControlPanelView extends JFrame {
 			fillerPanelsTempo.get(i).add(new JLabel("<html><b>Zug " + i + "</html>"), BorderLayout.CENTER);
 			fillerPanelsBattery.add(new JPanel());
 			fillerPanelsBattery.get(i).add(trainLabels.get(i)[1]);
+			fillerPanelsBattery.get(i).add(trainButtons.get(i)[3], BorderLayout.EAST);
 		}
 
 		panel.add(panelTrainLeft);
