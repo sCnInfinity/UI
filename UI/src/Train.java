@@ -106,6 +106,7 @@ public class Train extends JPanel implements Runnable {
 			g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
 		g2d.setTransform(old);
 		repaint();
+		g2d.dispose();
 	}
 
 	/**
@@ -368,6 +369,7 @@ public class Train extends JPanel implements Runnable {
 					moveLeft();
 				else if (cX < 95 && cY <= 400)
 					moveDown();
+				System.out.println("move");
 			}
 			if (getDirection().equals("forward")) {
 				cX = x + w / 2;
@@ -380,6 +382,7 @@ public class Train extends JPanel implements Runnable {
 					moveLeft();
 				else
 					moveUp();
+				System.out.println("move");
 			}
 			try {
 				Thread.sleep(500 / tempo);
@@ -387,6 +390,7 @@ public class Train extends JPanel implements Runnable {
 				e.printStackTrace();
 			}
 		}
+
 
 	}
 
@@ -419,6 +423,7 @@ public class Train extends JPanel implements Runnable {
 			cY = y + h / 2;
 			repaint();
 		}
+		System.out.println("Right");
 
 	}
 
@@ -449,6 +454,8 @@ public class Train extends JPanel implements Runnable {
 			cY = y + h / 2;
 			repaint();
 		}
+		
+		System.out.println("Down");
 	}
 
 	/**
@@ -477,6 +484,7 @@ public class Train extends JPanel implements Runnable {
 			cY = y + h / 2;
 		}
 		repaint();
+		System.out.println("Left");
 	}
 
 	/**
@@ -505,6 +513,7 @@ public class Train extends JPanel implements Runnable {
 			cY = y + h / 2;
 		}
 		repaint();
+		System.out.println("Up");
 	}
 
 	/**

@@ -17,12 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -216,9 +214,9 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 *            Name des Zuges
 	 * @category Setter
 	 */
-	public void writeConfigDataToFile(int index, String imagePath, String trainName) {
+	public void writeConfigDataToFile() {
 		// Es wird pro Index, also pro Zug, eine Texdatei erstellt.
-		Path path = Paths.get("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt");
+		Path path = Paths.get("C:/Users/Lucas/Desktop/SettingsTrains.txt");
 		try {
 			Files.createDirectories(path.getParent());
 			Files.createFile(path);
@@ -227,9 +225,10 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 			e1.printStackTrace();
 		}
 		try {
-			PrintWriter writer = new PrintWriter("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt");
-			writer.println(trainName);
-			writer.println(imagePath);
+			PrintWriter writer = new PrintWriter("C:/Users/Lucas/Desktop/SettingsTrains.txt");
+			for(int i = 0; i < numberOfTrains; i++) {
+				writer.println(listOfTrains.get(i).getName() + ";" + listOfTrains.get(i).getImagePath());
+			}
 			writer.close();
 		} catch (IOException e2) {
 			e2.printStackTrace();
@@ -335,11 +334,12 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		if (!oldBatteryMode && isBatteryPowered)
 			startBatteryWorker(index, false);
 		listOfTrains.get(index).setName(trainName, oldName);
+		listOfTrains.get(index).setImagePath(imagePath);
 		tView.getLabelsName().get(index).setText(trainName);
 		listOfTrains.get(index).setBatteryMode(isBatteryPowered);
 		// Auflade-Button aktivieren oder deaktivieren
 		cPanel.getTrainButtons().get(index)[1].setEnabled(isBatteryPowered);
-		writeConfigDataToFile(index, imagePath, trainName);
+		writeConfigDataToFile();
 		tView.getLabelsImg().get(index).setIcon(new ImageIcon(
 				new ImageIcon(imagePath).getImage().getScaledInstance(40, 40, java.awt.Image.SCALE_SMOOTH)));
 	}
@@ -358,10 +358,10 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 		try {
 			// Neuer BufferedReader, um Datei auszulesen
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream("C:/Users/Lucas/Desktop/SettingsTrain_" + index + ".txt")));
+					new FileInputStream("C:/Users/Lucas/Desktop/SettingsTrains.txt")));
 			// Jede Zeile einzeln den den Output-String anhaengen
 			while ((line = br.readLine()) != null) {
-				output += line + ";";
+				output += line + "\n";
 			}
 		} catch (Exception e) {
 		}
@@ -380,12 +380,16 @@ public class Controller implements ActionListener, ChangeListener, MouseListener
 	 * @category Getter
 	 */
 	public String[] readDataOnOpen(int index) {
-		String[] parts = new String[5];
+		String[] rows = new String[6];
+		String[] column = new String[6];
 		try {
-			parts = readDataFromFile(index).split(";");
+			rows = readDataFromFile(index).split("\n");
+			column = rows[index].split(";");
+			System.out.println(column[0]);
+			System.out.println(column[1]);
 		} catch (Exception e) {
 		}
-		return parts;
+		return column;
 	}
 
 	/**
