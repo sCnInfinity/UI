@@ -44,7 +44,7 @@ public class Train extends JPanel {
 	/** Zugnummer */
 	private int index;
 	/** Akkukapazitaet. Default-Wert ist 100 %. */
-	private int battery = 100;
+	private int battery = Constants.MAXBATTERYLIFE;
 	/**
 	 * Schrittgroesse, um die die Postion des Zuges bei der Bewegung verschoben
 	 * wird.
@@ -91,21 +91,19 @@ public class Train extends JPanel {
 	}
 
 	public void paintComponent(Graphics g) {
-		for (int i = 0; i < controller.getListOfTrains().size(); i++) {
-			Graphics2D g2d = (Graphics2D) g;
-			super.paintComponent(g);
-			AffineTransform old = g2d.getTransform();
-			g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
-			g2d.setColor(controller.getTrackView().getColors().get(index));
-			g2d.fillRect(12, 26, 30, 8);
-			if (controller.getListOfTrains().get(i).lightIsOn()) {
-				g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
-			} else
-				g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
-			g2d.setTransform(old);
-			repaint();
-			g2d.dispose();
-		}
+		Graphics2D g2d = (Graphics2D) g;
+		super.paintComponent(g);
+		AffineTransform old = g2d.getTransform();
+		g2d.rotate(Math.toRadians(rotation), w / 2, h / 2);
+		g2d.setColor(controller.getTrackView().getColors().get(index));
+		g2d.fillRect(12, 26, 30, 8);
+		if (light) {
+			g2d.drawImage(new ImageIcon(getClass().getResource("trainlight.png")).getImage(), 5, 25, 50, 10, this);
+		} else
+			g2d.drawImage(new ImageIcon(getClass().getResource("train.png")).getImage(), 5, 25, 50, 10, this);
+		g2d.setTransform(old);
+		repaint();
+		g2d.dispose();
 	}
 
 	/**
@@ -143,6 +141,10 @@ public class Train extends JPanel {
 		return imagePath;
 	}
 
+	public void setIndex(int i) {
+		index = i;
+	}
+	
 	/**
 	 * Setzt den Speicherpfad des Bildes.
 	 * 
@@ -186,11 +188,11 @@ public class Train extends JPanel {
 					battery = battery - 1;
 					// JProgressBar updaten
 					controller.getCPanel().getProgressBars().get(index).setValue(battery);
-					controller.getCPanel().getProgressBars().get(index).setString(battery + " %");
+					controller.getCPanel().getProgressBars().get(index).setString(battery / Constants.BATTERYDIVISOR + " %");
 
 					// Bei 25 und 50% Nachricht ins Log schreiben
-					if ((battery == 50 && running) || (battery == 25 && running))
-						controller.getLogView().updateLog(name + ": " + battery + "% Batterieleistung");
+					if ((battery == Constants.MAXBATTERYLIFE / 2 && running) || (battery == Constants.MAXBATTERYLIFE / 4 && running))
+						controller.getLogView().updateLog(name + ": " + battery / Constants.BATTERYDIVISOR + "% Batterieleistung");
 				}
 				// Nachricht ins Log wenn Batterie leer
 				if (battery < 1) {
@@ -204,14 +206,13 @@ public class Train extends JPanel {
 				// solange Akku nicht voll geladen, der Zug auflaedt und der Zug
 				// nicht
 				// laeuft
-				if (battery <= 99 && charging && !running) {
-					// Sleep-Aufruf, um das Programm fuer den Nutzer bedienbar zu
-					// machen.
+				if (battery <= Constants.MAXBATTERYLIFE - 1 && charging && !running) {
+					// Sleep-Aufruf, um das Programm fuer den Nutzer bedienbar zumachen.
 					// Akkulaufzeit erhoehen
 					battery = battery + 1;
 					// Aktualisiert die JProgressBar
 					controller.getCPanel().getProgressBars().get(index).setValue(battery);
-					controller.getCPanel().getProgressBars().get(index).setString(battery + " %");
+					controller.getCPanel().getProgressBars().get(index).setString(battery / Constants.BATTERYDIVISOR + " %");
 				}
 				// Nachricht im Log: Batterie aufgeladen, wenn Akku voll geladen
 				controller.getLogView().updateLog(name + ": Batterie aufgeladen.");
@@ -424,7 +425,6 @@ public class Train extends JPanel {
 					moveLeft();
 				else if (cX < 95 && cY <= 400)
 					moveDown();
-				System.out.println("move");
 			}
 			if (getDirection().equals("forward")) {
 				cX = x + w / 2;
@@ -437,10 +437,8 @@ public class Train extends JPanel {
 					moveLeft();
 				else
 					moveUp();
-				System.out.println("move");
 			}
 		}
-
 	}
 
 	/**
@@ -472,8 +470,6 @@ public class Train extends JPanel {
 			cY = y + h / 2;
 			repaint();
 		}
-		System.out.println("Right");
-
 	}
 
 	/**
@@ -503,8 +499,6 @@ public class Train extends JPanel {
 			cY = y + h / 2;
 			repaint();
 		}
-
-		System.out.println("Down");
 	}
 
 	/**
@@ -533,7 +527,6 @@ public class Train extends JPanel {
 			cY = y + h / 2;
 		}
 		repaint();
-		System.out.println("Left");
 	}
 
 	/**
@@ -562,7 +555,6 @@ public class Train extends JPanel {
 			cY = y + h / 2;
 		}
 		repaint();
-		System.out.println("Up");
 	}
 
 }

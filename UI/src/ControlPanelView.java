@@ -160,9 +160,9 @@ public class ControlPanelView extends JFrame {
 			trainLabels.add(new JLabel[] { new JLabel(), new JLabel("<html><p align ='center'>Akku</p></html>") });
 			trainLabels.get(i)[0]
 					.setText("<html><p align ='center'>" + trainSliders.get(i).getValue() + " <br>km/h</p></html>");
-			trainProgressBars.add(new JProgressBar(JProgressBar.HORIZONTAL, 0, 100));
-			trainProgressBars.get(i).setValue(100);
-			trainProgressBars.get(i).setString(100 + " %");
+			trainProgressBars.add(new JProgressBar(JProgressBar.HORIZONTAL, 0, Constants.MAXBATTERYLIFE));
+			trainProgressBars.get(i).setValue(Constants.MAXBATTERYLIFE);
+			trainProgressBars.get(i).setString(Constants.MAXBATTERYLIFE / Constants.BATTERYDIVISOR + " %");
 			trainProgressBars.get(i).setStringPainted(true);
 			fillerPanelsTempo.add(new JPanel(new BorderLayout()));
 			fillerPanelsTempo.get(i).add(trainLabels.get(i)[0], BorderLayout.NORTH);

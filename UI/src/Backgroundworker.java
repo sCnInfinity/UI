@@ -41,11 +41,14 @@ public class Backgroundworker extends JPanel implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
+			con.numberOfTrains = con.getListOfTrains().size();
 			for (int i = 0; i < con.getListOfTrains().size(); i++) {
 				con.getListOfTrains().get(i).moveTrain();
 
 				con.getListOfTrains().get(i).calculateBatteryLife();
 			}
+
+			
 			try {
 				Thread.sleep(10);
 			} catch (Exception e) {

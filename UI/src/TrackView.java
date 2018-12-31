@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 public class TrackView extends JFrame implements Runnable {
 	/** Controller-Instanz */
 	private Controller con;
-
+	
 	private Backgroundworker bw;
 	/** ArrayList mit allen Farben fuer Zuege */
 	private ArrayList<Color> colors = new ArrayList<>();
@@ -201,12 +201,13 @@ public class TrackView extends JFrame implements Runnable {
 		tDraw.setBounds(0, 0, panelLeft.getWidth(), panelLeft.getHeight());
 		while (true) {
 			for (int i = 0; i < labelsColor.size(); i++) {
-				int x = con.getListOfTrains().get(i).getPositionParameters()[0];
-				int y = con.getListOfTrains().get(i).getPositionParameters()[1];
-				int w = con.getListOfTrains().get(i).getPositionParameters()[2];
-				int h = con.getListOfTrains().get(i).getPositionParameters()[3];
-				con.getListOfTrains().get(i).setBounds(x, y, w, h);
-				con.getListOfTrains().get(i).setOpaque(false);
+					int x = con.getListOfTrains().get(i).getPositionParameters()[0];
+					int y = con.getListOfTrains().get(i).getPositionParameters()[1];
+					int w = con.getListOfTrains().get(i).getPositionParameters()[2];
+					int h = con.getListOfTrains().get(i).getPositionParameters()[3];
+					con.getListOfTrains().get(i).setBounds(x, y, w, h);
+					con.getListOfTrains().get(i).setOpaque(false);
+				
 			}
 		}
 	}
